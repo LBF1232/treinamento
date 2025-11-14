@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Catálogo de Treinamentos - Novo Mateus</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+
+  <style>
+    /* --- CORES E VARIÁVEIS (Copiado do seu arquivo) --- */
+    :root{
+      --novo-1: #F37021; --novo-2: #005A9C;
+      --mateus-1: #D62828; --mateus-2: #F7B733;
+      
+      --bg-start: var(--novo-1); --bg-end: var(--novo-2);
+
+      --card-bg: rgba(255,255,255,0.86);
+      --glass-blur: 16px;
+      --radius: 20px;
+      --text: #111;
+      --muted: #555;
+      --max-width: 1200px; /* Mais largo para um dashboard */
+      --gap: 1.25rem;
+    }
+
+    /* --- ESTILOS GLOBAIS (Copiado do seu arquivo) --- */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    }
+    html { font-size: 15px; box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: inherit; }
+
+    body{
+      min-height:100vh; margin:0; display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      padding: 2rem;
+      transition: background 1s ease-in-out;
+    }
+
+    /* --- NOVO LAYOUT (Sidebar + Conteúdo) --- */
+    .layout-container {
+      display: flex;
+      width: 100%;
+      max-width: var(--max-width);
+      min-height: calc(90vh - 4rem);
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    /* --- NOVA SIDEBAR --- */
+    .sidebar {
+      flex: 0 0 240px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      background: rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--radius);
+      backdrop-filter: blur(var(--glass-blur));
+      color: white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .sidebar-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
+    }
+    .sidebar-logo {
+      max-width: 90px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.2);
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .sidebar-title {
+      font-size: 1.3rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .nav-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.8);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    .nav-btn.active {
+      background: rgba(255,255,255,0.9);
+      color: var(--novo-2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* --- POP-UP DE LINKS --- */
+    .links-popup {
+      display: none; 
+      position: absolute;
+      bottom: 1.5rem; 
+      left: calc(240px + 1.5rem + 1rem); 
+      width: 360px; 
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      backdrop-filter: blur(var(--glass-blur));
+      z-index: 1000;
+      padding: 0.75rem;
+      opacity: 0;
+    }
+    .links-popup.visible { display: block; }
+    .links-popup h3 {
+      margin: 0.25rem 0.5rem 0.75rem 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .link-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.5rem;
+      border-radius: 8px;
+    }
+    .link-item:hover { background: rgba(0,0,0,0.04); }
+    .link-item span {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem; 
+    }
+    
+    .link-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .copy-btn {
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      border: 2px solid var(--novo-2);
+      background: var(--novo-2);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .copy-btn:hover { background: var(--novo-1); border-color: var(--novo-1); }
+    .copy-btn:active { transform: scale(0.95); }
+    .copy-btn.copied { background: #28a745; border-color: #28a745; }
+
+    .go-btn {
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      border: 2px solid var(--novo-2); 
+      background: transparent;
+      color: var(--novo-2); 
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .go-btn:hover {
+      background: var(--novo-2);
+      color: white;
+    }
+    .go-btn:active { transform: scale(0.95); }
+
+
+    /* --- CONTEÚDO PRINCIPAL (Catálogo) --- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .catalog-wrap {
+      width: 100%;
+      height: auto;
+      background: var(--card-bg); 
+      border-radius: var(--radius);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+      overflow: visible;
+      border: 1px solid rgba(255,255,255,0.6);
+      padding: 1.5rem 2rem;
+    }
+    .catalog-wrap h1 {
+      font-size: 2rem;
+      margin: 0.5rem 0 0.25rem 0;
+      color: var(--text);
+    }
+    .catalog-wrap .catalog-subtitle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    /* --- GRID DE TREINAMENTOS --- */
+    .training-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .training-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      text-decoration: none;
+      background: #FFFFFF; 
+      border-radius: 14px;
+      padding: 1rem;
+      border: 1px solid rgba(0,0,0,0.08); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+      transition: all 0.25s ease;
+      min-height: 200px; 
+    }
+    .training-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+      border-color: var(--novo-2);
+    }
+    
+    .card-icon {
+      height: 120px; 
+      background: #f0f2f5; 
+      border-radius: 10px;
+      color: var(--novo-2);
+      overflow: hidden; 
+      display: grid; 
+      place-items: center; 
+    }
+    
+    .card-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; 
+    }
+
+    .fallback {
+      font-size: 1rem;
+      color: var(--novo-2);
+      font-weight: 700;
+      padding: .8rem;
+      text-align: center;
+    }
+    
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text); 
+      text-align: center;
+      min-height: 2.5em; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Responsivo */
+    @media (max-width: 800px) {
+      body { padding: 0; }
+      .layout-container {
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100%;
+        gap: 0;
+      }
+      .sidebar {
+        flex: 0 0 auto;
+        border-radius: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+      }
+      .sidebar-header { flex-direction: row; gap: 0.75rem; }
+      .sidebar-logo { max-width: 40px; }
+      .sidebar-title { font-size: 1.1rem; }
+      .sidebar-nav { flex-direction: row; }
+      .nav-btn { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
+      
+      .catalog-wrap {
+        border-radius: var(--radius) var(--radius) 0 0;
+        flex: 1;
+        padding: 1.5rem;
+      }
+      .links-popup {
+        left: 1rem;
+        bottom: auto;
+        top: 60px; 
+        width: calc(100% - 2rem);
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="layout-container" role="application">
+    
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="img/logo-novo-mateus.png" alt="Novo Mateus Logo" class="sidebar-logo">
+        <h2 class="sidebar-title">Novo Mateus</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" aria-current="page">
+          <span>🏠</span>
+          <span>Início</span>
+        </button>
+        <button class="nav-btn" id="linksBtn" aria-haspopup="true">
+          <span>🔗</span>
+          <span>Links</span>
+        </button>
+      </nav>
+      <div style="flex:1;"></div> </aside>
+
+    <main class="main-content">
+      <div class="catalog-wrap">
+        <h1>Catálogo de Treinamentos</h1>
+        <p class="catalog-subtitle">Selecione um guia passo a passo para começar.</p>
+
+        <div class="training-grid">
+
+          <a href="treinamento-pdv.html" class="training-card" aria-label="Iniciar treinamento: Formatação de PDV">
+            <div class="card-icon">
+              <img src="img/pdv.png" alt="Ilustração da Formatação de PDV">
+            </div>
+            <span class="card-title">Formatação de PDV</span>
+          </a>
+          
+          <a href="#" class="training-card" aria-label="Iniciar treinamento: Gestão de Estoque (WMS)">
+            <div class="card-icon fallback">
+              Gestão de Estoque (WMS)
+            </div>
+            <span class="card-title">Gestão de Estoque (WMS)</span>
+          </a>
+
+          <a href="#" class="training-card" aria-label="Iniciar treinamento: Operação de Caixa">
+            <div class="card-icon fallback">
+              Operação de Caixa
+            </div>
+            <span class="card-title">Operação de Caixa</span>
+          </a>
+
+          <a href="#" class="training-card" aria-label="Iniciar treinamento: Recebimento de Mercadoria">
+            <div class="card-icon fallback">
+              Recebimento de Mercadoria
+            </div>
+            <span class="card-title">Recebimento de Mercadoria</span>
+          </a>
+          
+          
+          <a href="#" class="training-card" aria-label="Iniciar treinamento: Troca e Devolução">
+            <div class="card-icon fallback">
+              Troca e Devolução
+            </div>
+            <span class="card-title">Troca e Devolução</span>
+          </a>
+
+          <a href="#" class="training-card" aria-label="Iniciar treinamento: Emissão de Notas Fiscais">
+            <div class="card-icon fallback">
+              Emissão de Notas Fiscais
+            </div>
+            <span class="card-title">Emissão de Notas Fiscais</span>
+          </a>
+
+        </div>
+      </div>
+    </main>
+
+    <div class="links-popup" id="linksPopup" role="dialog" aria-labelledby="linksTitle">
+      <h3 id="linksTitle">Links Rápidos</h3>
+      
+      <div class="link-item">
+        <span>Acesso Consinco</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="https://novoatacarejo.autosky.cloud/">Copiar</button>
+          <button class="go-btn" data-link="https://novoatacarejo.autosky.cloud/">Acessar</button>
+        </div>
+      </div>
+      
+      <div class="link-item">
+        <span>Monitor PDV (Impressão)</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="http://10.101.108.7/MonitorPDV/login">Copiar</button>
+          <button class="go-btn" data-link="http://10.101.108.7/MonitorPDV/login">Acessar</button>
+        </div>
+      </div>
+
+      <div class="link-item">
+        <span>Chamados (Helpdesk)</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="http://help.novoatacarejo.com/">Copiar</button>
+          <button class="go-btn" data-link="http://help.novoatacarejo.com/">Acessar</button>
+        </div>
+      </div>
+      
+      <div class="link-item">
+        <span>Sistema da Loja (Dext)</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="https://novoatacarejo.dext.com.br/login.php">Copiar</button>
+          <button class="go-btn" data-link="https://novoatacarejo.dext.com.br/login.php">Acessar</button>
+        </div>
+      </div>
+
+      <div class="link-item">
+        <span>Webmail</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="https://webmail.novoatacarejo.com/">Copiar</button>
+          <button class="go-btn" data-link="https://webmail.novoatacarejo.com/">Acessar</button>
+        </div>
+      </div>
+
+      <div class="link-item">
+        <span>Intranet</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="https://intranet.novomateus.com.br">Copiar</button>
+          <button class="go-btn" data-link="https://intranet.novomateus.com.br">Acessar</button>
+        </div>
+      </div>
+      
+      <div class="link-item">
+        <span>Portal RH</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="httpsD://rh.novomateus.com.br">Copiar</button>
+          <button class="go-btn" data-link="https://rh.novomateus.com.br">Acessar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // --- Script do Pop-up de Links ---
+      const linksBtn = document.getElementById('linksBtn');
+      const linksPopup = document.getElementById('linksPopup');
+
+      if (linksBtn && linksPopup) { // <-- Adicionada verificação
+        linksBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          const isVisible = linksPopup.classList.toggle('visible');
+          linksBtn.setAttribute('aria-expanded', isVisible);
+          
+          // Animação com GSAP
+          if (isVisible) {
+            gsap.fromTo(linksPopup, {opacity:0, y:-10}, {opacity:1, y:0, duration:0.3, ease:'power2.out'});
+          }
+        });
+      } // <-- Fim da verificação
+
+      // Fechar ao clicar fora do pop-up
+      document.addEventListener('click', (e) => {
+        if (linksPopup && !linksPopup.contains(e.target) && e.target !== linksBtn) {
+          linksPopup.classList.remove('visible');
+          if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // --- Script de Copiar Link ---
+      document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          const linkToCopy = button.dataset.link;
+          
+          navigator.clipboard.writeText(linkToCopy).then(() => {
+            const originalText = button.textContent;
+            button.textContent = 'Copiado!';
+            button.classList.add('copied'); 
+            
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.classList.remove('copied');
+            }, 1500);
+          }).catch(err => {
+            console.error('Falha ao copiar link: ', err);
+            button.textContent = 'Erro!';
+          });
+        });
+      });
+
+      // --- Script de Acessar Link ---
+      document.querySelectorAll('.go-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          const linkToOpen = button.dataset.link;
+          if (linkToOpen) {
+            window.open(linkToOpen, '_blank'); 
+          }
+        });
+      });
+
+
+      /*
+      // --- [SEÇÃO REMOVIDA] ---
+      // Esta animação estava causando o desaparecimento dos cards.
+      // --- Animações de Entrada (GSAP) ---
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // Anima a sidebar
+        gsap.from('.sidebar', {
+          duration: 0.8, x: -50, opacity: 0, 
+          ease: 'power2.out', delay: 0.2
+        });
+        
+        // Anima o card principal
+        gsap.from('.catalog-wrap', {
+          duration: 0.8, y: 50, opacity: 0, 
+          ease: 'power2.out', delay: 0.4
+        });
+        
+        // Anima os cards do catálogo em sequência
+        gsap.from('.training-card', {
+          duration: 0.5, y: 30, opacity: 0, 
+          ease: 'power2.out', stagger: 0.1, delay: 0.7
+        });
+      }
+      */
+    });
+  </script>
+</body>
+</html>

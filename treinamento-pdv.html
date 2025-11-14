@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POP: Formatação de PDV — Wizard</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+
+  <style>
+    :root{
+      --novo-1: #F37021; --novo-2: #005A9C;
+      --mateus-1: #D62828; --mateus-2: #F7B733;
+      --bg-start: var(--novo-1); --bg-end: var(--novo-2);
+      --card-bg: rgba(255,255,255,0.86);
+      --glass-blur: 16px;
+      --radius: 20px;
+      --text: #111;
+      --muted: #555;
+      --max-width: 880px;
+      --gap: 1.25rem;
+    }
+
+    /* Respect user preference for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    }
+
+    html { font-size: 15px; box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: inherit; }
+
+    body{
+      min-height:100vh; margin:0; display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      padding: 2rem;
+      transition: background 1s ease-in-out;
+    }
+
+    /* Container principal */
+    .wizard-wrap{
+      width: 100%;
+      max-width: var(--max-width);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+      overflow: hidden;
+      display:flex; flex-direction:column;
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    /* Top: título + progress */
+    .wizard-header{
+      padding: 1rem 1.25rem;
+      display:flex; flex-direction:column; gap: 0.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.12));
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .wizard-title{
+      display:flex; align-items:center; gap:0.75rem;
+    }
+    
+    /* [NOVO] Estilo do Botão Voltar */
+    .back-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(255,255,255,0.25));
+      font-weight: 700;
+      color: var(--novo-2);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      text-decoration: none;
+      font-size: 2rem; /* Seta grande */
+      line-height: 1;
+      transition: transform 0.2s ease;
+      flex-shrink: 0; /* Garante que ele não encolha */
+    }
+    .back-btn:hover {
+      transform: scale(1.05);
+    }
+    /* [FIM] Estilo do Botão Voltar */
+    
+    .brand-badge{
+      width:48px; height:48px; border-radius:10px; display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(255,255,255,0.25));
+      font-weight:700; color:var(--novo-2);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .wizard-title h1{ font-size:1.1rem; margin:0; letter-spacing: -0.2px; }
+    .wizard-meta{ font-size:0.85rem; color:var(--muted); margin-top:2px; }
+
+    /* Progress bar */
+    .progress-wrap{ height:8px; background:rgba(0,0,0,0.04); border-radius:999px; overflow:hidden; }
+    .progress-bar{
+      height:100%; width:0%;
+      background: linear-gradient(90deg,var(--novo-2), var(--mateus-2));
+      transition: width 0.5s ease;
+    }
+
+    /* Stepper nav (horiz scroll pills) */
+    .stepper-nav{
+      display:flex; gap:8px; padding: 0.75rem 1rem; overflow-x:auto; align-items:center;
+      list-style:none; margin:0; -webkit-overflow-scrolling:touch;
+    }
+    .stepper-nav::-webkit-scrollbar{ display:none; }
+    .stepper-btn{
+      flex:0 0 auto;
+      border-radius:999px; padding:8px 14px;
+      border: 2px solid var(--novo-2);
+      background:transparent; color:var(--novo-2); font-weight:600; font-size:0.9rem;
+      cursor:pointer; white-space:nowrap;
+      transition: transform 0.18s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+    .stepper-btn:focus{ outline:3px solid rgba(0,90,156,0.12); outline-offset:3px; }
+    .stepper-btn.active{ background:var(--novo-2); color:white; border-color:transparent; transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,90,156,0.12); }
+
+    /* Sua correção, mantida */
+    .wizard-body{ 
+      width:100%; 
+      min-height:360px; 
+      position:relative; 
+      overflow: hidden; 
+    }
+    .wizard-track{ 
+      display:flex; 
+      width:100%; 
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(.22,.9,.2,1); 
+    }
+
+    /* Sua correção, mantida */
+    .step-pane{
+      width:100%; 
+      flex:0 0 100%; 
+      padding:1.25rem 1.5rem 1.75rem 1.5rem; 
+      overflow:auto;
+      max-height: calc(70vh); 
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step-counter{ 
+      font-size:0.85rem; 
+      font-weight:700; 
+      color:var(--novo-2); 
+      margin-bottom:0.5rem; 
+    }
+    .step-pane h2{ 
+      font-size:1.6rem; 
+      margin:0 0 0.75rem 0; 
+      line-height: 1.2;
+    }
+    .step-pane h3{ 
+      font-size:1.1rem; 
+      margin:1.25rem 0 0.5rem 0; 
+      color: var(--novo-1); 
+    }
+    .step-pane p, .step-pane li{ 
+      font-size:1rem; 
+      line-height:1.55; 
+      color:#333; 
+      margin: 0.5rem 0;
+    }
+    .step-pane ul, .step-pane ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    .step-visual{
+      height:100px; 
+      border-radius:12px; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      background:rgba(0,0,0,0.04); 
+      border:2px dashed rgba(0,0,0,0.06); 
+      cursor:pointer; 
+      margin-bottom:1rem;
+      font-size: 3rem; /* Tamanho do emoji */
+      transition: transform 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+    }
+    .step-visual:focus{ outline:3px solid rgba(0,90,156,0.12); outline-offset:3px; }
+    .step-visual:hover{ transform:scale(1.03); box-shadow: 0 8px 18px rgba(0,0,0,0.06); }
+
+    .info-block{
+      background: rgba(0,90,156,0.06); 
+      border:1px solid rgba(0,90,156,0.12); 
+      padding:1rem; 
+      border-radius:10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; 
+      font-size:0.95rem;
+      margin: 0.75rem 0;
+    }
+    .info-block small {
+      display:block; 
+      margin-top:5px;
+      color: var(--muted);
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    
+    .warning-block{
+      background: rgba(214,40,40,0.08); 
+      border:1px solid rgba(214,40,40,0.2); 
+      padding:1rem; 
+      border-radius:10px;
+      color:#D62828; 
+      font-weight:600;
+      margin: 0.75rem 0;
+    }
+
+    /* Navigation footer */
+    .wizard-footer{
+      padding:0.9rem 1.25rem; 
+      display:flex; 
+      align-items:center; 
+      justify-content:space-between;
+      border-top:1px solid rgba(0,0,0,0.05); 
+      gap:10px; 
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    }
+    .wizard-navigation{ display:flex; gap:0.75rem; align-items:center; }
+    .btn{
+      padding:0.6rem 1rem; 
+      border-radius:10px; 
+      border:none; 
+      cursor:pointer; 
+      font-weight:700; 
+      font-size:0.98rem;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+    .btn:active{ transform:translateY(1px); }
+    #prevBtn{ background:#f0f0f0; color:#333; }
+    #nextBtn{ background:var(--novo-2); color:white; box-shadow: 0 8px 22px rgba(0,90,156,0.14); }
+
+    .btn[disabled]{ opacity:0.6; cursor:not-allowed; filter:grayscale(0.2); }
+
+    .step-indicator{ font-weight:700; color:var(--muted); }
+
+    /* Lightbox */
+    .lightbox{
+      position:fixed; inset:0; display:none; z-index:9000; justify-content:center; align-items:center;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      opacity:0; transition: opacity 0.28s ease;
+    }
+    .lightbox.visible{ display:flex; opacity:1; }
+    .lightbox-content{
+      max-width:92%; max-height:86%; display:grid; place-items:center; color:white;
+      font-size:8rem; transform:scale(0.9); transition: transform 0.28s ease;
+    }
+    .lightbox.visible .lightbox-content{ transform:scale(1); }
+    .close-lightbox{ position:absolute; top:1.25rem; right:1.25rem; font-size:2.2rem; color:#fff; cursor:pointer; background:transparent; border:none; }
+
+    /* Responsive */
+    @media (max-width:720px){
+      :root{ --max-width: 100%; }
+      .step-pane{ padding:1rem; }
+      .wizard-header{ padding:0.75rem; }
+      .wizard-footer{ padding:0.75rem; }
+      .step-visual{ height:110px; }
+      .brand-badge{ width:44px; height:44px; }
+      /* [NOVO] Ajuste responsivo para o botão voltar */
+      .back-btn { width: 44px; height: 44px; font-size: 1.8rem; } 
+      .wizard-body{ min-height:360px; }
+      .step-pane h2 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wizard-wrap" role="application" aria-labelledby="wizardTitle">
+    <header class="wizard-header">
+      <div class="wizard-title">
+        
+        <a href="index.html" class="back-btn" aria-label="Voltar ao catálogo">&larr;</a>
+        
+        <div class="brand-badge" aria-hidden="true">PDV</div>
+        <h1 id="wizardTitle">POP: Formatação e Instalação de PDV</h1>
+        <div class="wizard-meta">ISO: TOTVS Varejo Supermercados PDV-25.8.0.1</div>
+      </div>
+
+      <div class="progress-wrap" aria-hidden="true">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+
+      <nav class="stepper-nav" id="stepperNav" aria-label="Navegação das etapas" role="navigation">
+        <button class="stepper-btn active" data-step-index="0">1. Materiais</button>
+        <button class="stepper-btn" data-step-index="1">2. Acessar Boot</button>
+        <button class="stepper-btn" data-step-index="2">3. Instalar ISO</button>
+        <button class="stepper-btn" data-step-index="3">4. Rede</button>
+        <button class="stepper-btn" data-step-index="4">5. Servidor</button>
+        <button class="stepper-btn" data-step-index="5">6. Finalização</button>
+        <button class="stepper-btn" data-step-index="6">7. Licenciamento</button>
+      </nav>
+    </header>
+
+    <main class="wizard-body" id="wizardBody">
+      <div class="wizard-track" id="wizardTrack" aria-live="polite" aria-atomic="true">
+
+        <section class="step-pane" role="region" aria-labelledby="step1title" data-step="1">
+          <div class="step-counter">Etapa 1 de 7</div>
+          <h2 id="step1title">Materiais Necessários</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de pendrive" data-zoom-content="💾">💾</div>
+          <p>Antes de iniciar, garanta que você tenha:</p>
+          <ul>
+            <li><strong>Pendrive bootável</strong> (preparado com Ventoy ou Rufus).</li>
+            <li><strong>ISO</strong> <code>TOTVS Varejo Supermercados PDV-25.8.0.1</code> carregada no pendrive.</li>
+            <li><strong>Dados de rede da loja</strong> (faixa de IP e Gateway).</li>
+          </ul>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step2title" data-step="2">
+          <div class="step-counter">Etapa 2 de 7</div>
+          <h2 id="step2title">Acessar o Menu de Boot</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de reboot" data-zoom-content="🔄">🔄</div>
+          
+          <h3>Cenário A: PDV Novo, Zerado ou Desligado</h3>
+          <ol>
+            <li>Com o PDV desligado, insira o pendrive.</li>
+            <li>Ligue o PDV e pressione <strong>DEL</strong> ou <strong>F2</strong> para acessar a BIOS.</li>
+            <li>Navegue até as opções de <strong>Boot (Inicialização)</strong>.</li>
+            <li>Selecione o pendrive como prioridade (Ex: <code>UEFI Kingston</code>).</li>
+            <li>Pressione <strong>F10</strong> para "Salvar e Sair".</li>
+          </ol>
+
+          <h3>Cenário B: PDV Ligado (Sistema Ativo)</h3>
+          <ol>
+            <li>Com o sistema ligado, insira o pendrive.</li>
+            <li>Pressione as teclas <strong>Alt + F2</strong> simultaneamente.</li>
+            <li>Digite <code>reboot</code> e pressione Enter.</li>
+            <li>Enquanto o PDV reinicia, pressione <strong>F12</strong> (Menu de Boot).</li>
+            <li>Selecione o pendrive na lista de dispositivos.</li>
+          </ol>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step3title" data-step="3">
+          <div class="step-counter">Etapa 3 de 7</div>
+          <h2 id="step3title">Instalação da ISO</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de cd" data-zoom-content="💿">💿</div>
+          <p>Na tela de configuração da ISO, confirme a versão:</p>
+          <div class="info-block">
+            <strong>ISO:</strong> TOTVS Varejo Supermercados PDV-25.8.0.1
+          </div>
+          
+          <ol>
+            <li>Selecione a opção <strong>Boot in normal mode</strong>.</li>
+            <li>O sistema carregará. Clique em <strong>Instalar</strong>.</li>
+          </ol>
+          <p><strong>Nota (Opcional):</strong> Caso surja uma notificação, clique no ícone de engrenagem (Opções), confirme em OK, desmarque a opção "Mostrar mensagem" e clique em "OK".</p>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step4title" data-step="4">
+          <div class="step-counter">Etapa 4 de 7</div>
+          <h2 id="step4title">Configuração de Rede</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de rede" data-zoom-content="🌐">🌐</div>
+          <p>Preencha com atenção os dados de rede do PDV:</p>
+          <div class="info-block" aria-live="polite">
+            <strong>Endereço IP:</strong> 192.168.X.Y<br>
+            <small>(Nota: X = faixa da loja, Y = sequência do PDV. Ex: 192.168.5.242)</small><br><br>
+            <strong>Máscara de sub-rede:</strong> 255.255.255.0<br><br>
+            <strong>Gateway Padrão:</strong> 192.168.X.254<br>
+            <small>(Nota: X = faixa da loja. Ex: 192.168.5.254)</small><br><br>
+            <strong>DNS Preferencial:</strong> 10.101.108.19<br>
+            <strong>DNS Alternativo:</strong> 8.8.8.8
+          </div>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step5title" data-step="5">
+          <div class="step-counter">Etapa 5 de 7</div>
+          <h2 id="step5title">Configuração do Servidor</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de servidor" data-zoom-content="🖥️">🖥️</div>
+          <p>Após a rede, o instalador solicitará o IP do servidor principal:</p>
+          <div class="info-block">
+            <strong>Servidor principal do PDV's:</strong> 10.101.108.7
+          </div>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step6title" data-step="6">
+          <div class="step-counter">Etapa 6 de 7</div>
+          <h2 id="step6title">Finalização da Instalação</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de upload" data-zoom-content="📤">📤</div>
+          <p>Uma mensagem de confirmação aparecerá:</p>
+          <code>"Please remove the installation medium, then press ENTER:"</code>
+          
+          <div class="warning-block" role="status" aria-live="assertive">
+            ⚠️ <strong>AÇÃO CRÍTICA:</strong> REMOVA O PENDRIVE da porta USB e <strong>depois</strong> pressione Enter.
+          </div>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step7title" data-step="7">
+          <div class="step-counter">Etapa 7 de 7</div>
+          <h2 id="step7title">Verificação de Licenciamento</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de chave" data-zoom-content="🔑">🔑</div>
+          <p>O licenciamento é automático (20–30 min). Observe o ícone da chave (Key):</p>
+          <ul>
+            <li><strong style="color: #555;">✅ Chave (Key) CINZA:</strong> PDV licenciado e pronto.</li>
+            <li><strong style="color: #F7B733;">⚠️ Chave (Key) AMARELA:</strong> PDV NÃO licenciado.</li>
+          </ul>
+          <h3>Solução de Problemas</h3>
+          <p>Se a chave permanecer amarela por mais de 30 minutos, o licenciamento falhou.</p>
+          <div class="warning-block">
+            <strong>Ação:</strong> Entre em contato com a TI da Matriz e solicite o licenciamento manual.
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="wizard-footer" role="contentinfo">
+      <div class="step-indicator" id="stepIndicator" aria-live="polite">Etapa 1 / 7</div>
+      <div class="wizard-navigation" aria-hidden="false">
+        <button id="prevBtn" class="btn" aria-label="Etapa anterior">Anterior</button>
+        <button id="nextBtn" class="btn" aria-label="Próxima etapa">Seguir</button>
+      </div>
+    </footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Visualização ampliada">
+    <button class="close-lightbox" id="closeLightbox" aria-label="Fechar visualização">&times;</button>
+    <div class="lightbox-content" id="lightboxContent" tabindex="0"></div>
+  </div>
+
+  <script>
+    // Elementos principais
+    const wizardTrack = document.getElementById('wizardTrack');
+    const stepPanes = Array.from(document.querySelectorAll('.step-pane'));
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const stepIndicator = document.getElementById('stepIndicator');
+    const progressBar = document.getElementById('progressBar');
+
+    const stepperNav = document.getElementById('stepperNav');
+    const stepperButtons = Array.from(stepperNav.querySelectorAll('.stepper-btn'));
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxContent = document.getElementById('lightboxContent');
+    const closeLightbox = document.getElementById('closeLightbox');
+
+    const totalSteps = stepPanes.length; // Isso agora contará 7
+    let currentStep = 0;
+
+    // --- Função: mostrar etapa ---
+    function showStep(stepIndex, opts = {}) {
+      // Clamp
+      stepIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
+      currentStep = stepIndex;
+
+      // Move track
+      const offset = -currentStep * 100;
+      wizardTrack.style.transform = `translateX(${offset}%)`;
+
+      // Atualiza botões
+      prevBtn.disabled = currentStep === 0;
+      nextBtn.disabled = false;
+      nextBtn.textContent = (currentStep === totalSteps - 1) ? 'Finalizar' : 'Seguir';
+
+      // Atualiza stepper active
+      stepperButtons.forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === currentStep);
+        btn.setAttribute('aria-pressed', idx === currentStep ? 'true' : 'false');
+      });
+
+      // Atualiza indicador e progress
+      stepIndicator.textContent = `Etapa ${currentStep + 1} / ${totalSteps}`;
+      const percent = ((currentStep + 1) / totalSteps) * 100;
+      progressBar.style.width = `${percent}%`;
+
+      // Move o stepper para o item ativo (centraliza)
+      const activeBtn = stepperButtons[currentStep];
+      if (activeBtn) activeBtn.scrollIntoView({behavior: 'smooth', inline: 'center'});
+
+      // Animação de entrada da etapa com GSAP (respeita prefers-reduced-motion)
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const pane = stepPanes[currentStep];
+        gsap.fromTo(pane, {opacity:0, y:18}, {opacity:1, y:0, duration:0.5, ease:'power2.out'});
+      }
+
+      // Atualiza background progressivo (mistura das paletas)
+      animateBackground(currentStep);
+
+      // foco na etapa para acessibilidade
+      stepPanes[currentStep].querySelectorAll('button, [tabindex], a, input').forEach(el => el.setAttribute('tabindex','0'));
+      stepPanes[currentStep].focus?.();
+    }
+
+    // --- Next / Prev ---
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < totalSteps - 1) {
+        showStep(currentStep + 1);
+      } else {
+        // Finalizar: ação simples - aqui apenas mostra mensagem e retorna ao início
+        gsap.to(nextBtn, {scale:1.06, duration:0.12, yoyo:true, repeat:1});
+        gsap.fromTo(stepperNav, {backgroundColor:'rgba(0,0,0,0)'}, {backgroundColor:'rgba(0,0,0,0.02)', duration:0.4});
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) showStep(currentStep - 1);
+    });
+
+    // --- Stepper click ---
+    stepperButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(btn.dataset.stepIndex, 10);
+        if (!Number.isNaN(idx)) showStep(idx);
+      });
+
+      // keyboard accessibility: Enter/Space
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); btn.click();
+        }
+      });
+    });
+
+    // --- Lightbox (ampliar) ---
+    document.querySelectorAll('.step-visual').forEach(visual => {
+      visual.addEventListener('click', () => {
+        const content = visual.getAttribute('data-zoom-content') || visual.innerText;
+        openLightbox(content);
+      });
+      visual.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); visual.click();
+        }
+      });
+    });
+
+    function openLightbox(content){
+      lightboxContent.innerHTML = content;
+      lightbox.classList.add('visible');
+      lightbox.setAttribute('aria-hidden','false');
+      // anima com GSAP
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        gsap.fromTo('.lightbox-content', {scale:0.94, opacity:0}, {scale:1, opacity:1, duration:0.28, ease:'power2.out'});
+      }
+      // focus para fechar com ESC/Tab
+      closeLightbox.focus();
+    }
+    function closeZoom(){
+      lightbox.classList.remove('visible');
+      lightbox.setAttribute('aria-hidden','true');
+    }
+    closeLightbox.addEventListener('click', closeZoom);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeZoom();
+    });
+
+    // keyboard global: setas, Home/End, Esc
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        if (currentStep < totalSteps -1) showStep(currentStep + 1);
+      } else if (e.key === 'ArrowLeft') {
+        if (currentStep > 0) showStep(currentStep - 1);
+      } else if (e.key === 'Home') {
+        showStep(0);
+      } else if (e.key === 'End') {
+        showStep(totalSteps - 1);
+      } else if (e.key === 'Escape') {
+        // fecha lightbox se aberto
+        if (lightbox.classList.contains('visible')) closeZoom();
+      }
+    });
+
+    // --- Função: anima background de forma suave ---
+    function animateBackground(stepIndex){
+      const progress = stepIndex / (totalSteps - 1);
+      // interpolação simples entre as cores principais
+      // usando GSAP set para variáveis CSS
+      const start = (progress < 0.5) ? getComputedStyle(document.documentElement).getPropertyValue('--novo-1') : getComputedStyle(document.documentElement).getPropertyValue('--mateus-1');
+      const end = (progress < 0.5) ? getComputedStyle(document.documentElement).getPropertyValue('--novo-2') : getComputedStyle(document.documentElement).getPropertyValue('--mateus-2');
+
+      // create a bg gradient using a mix of both pairs depending on progress
+      const grad = `linear-gradient(135deg, ${lerpColor('#F37021','#D62828', progress)}, ${lerpColor('#005A9C','#F7B733', progress)})`;
+      gsap.to(document.body, {background: grad, duration:1.0, ease:'power1.inOut'});
+      // também tint nextBtn
+      const nextColor = lerpColor('#005A9C','#D62828', progress);
+      gsap.to(nextBtn, {backgroundColor: nextColor, duration:0.9});
+      // tint stepper borders
+      stepperButtons.forEach((b,idx) => {
+        const isActive = idx === stepIndex;
+        if (isActive) gsap.to(b, {backgroundColor: nextColor, color:'#fff', borderColor: nextColor, duration:0.9});
+        else gsap.to(b, {backgroundColor: 'transparent', color: nextColor, borderColor: nextColor, duration:0.9});
+      });
+    }
+
+    // small helper to interpolate hex colors
+    function lerpColor(a, b, amount) {
+      const ah = parseInt(a.replace('#',''),16), bh = parseInt(b.replace('#',''),16);
+      const ar = ah >> 16, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
+      const br = bh >> 16, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+      const rr = Math.round(ar + (br - ar) * amount);
+      const rg = Math.round(ag + (bg - ag) * amount);
+      const rb = Math.round(ab + (bb - ab) * amount);
+      return `#${(rr<<16 | rg<<8 | rb).toString(16).padStart(6,'0')}`;
+    }
+
+    // Inicializar
+    showStep(0);
+
+    // A11y improvements: mark stepper buttons with ARIA attributes
+    stepperButtons.forEach((b, idx) => {
+      b.setAttribute('role','button');
+      b.setAttribute('aria-controls','wizardTrack');
+      b.setAttribute('aria-label', `Ir para etapa ${idx+1}`);
+      b.tabIndex = 0;
+    });
+
+    // Prevent scroll chaining on track when using touch scroll on stepper
+    stepperNav.addEventListener('touchmove', (e) => { e.stopPropagation(); }, {passive:true});
+
+  </script>
+</body>
+</html>
