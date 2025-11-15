@@ -124,28 +124,24 @@
     .wizard-body{ 
       width:100%; 
       min-height:360px; /* Garante que o container tenha altura */
-      position:relative; 
-      overflow: hidden; /* Esconde os outros slides */
+      position:relative;
     }
     .wizard-track{ 
-      display:flex; /* Coloca os slides um ao lado do outro */
       width:100%; 
       height: 100%;
-      transition: transform 0.6s cubic-bezier(.22,.9,.2,1); 
     }
 
     .step-pane{
+      display: none; /* Oculta todos os passos por padrão */
       width:100%; 
-      flex: 0 0 100%; /* Cada slide ocupa 100% da largura */
       padding:1.25rem 1.5rem 1.75rem 1.5rem; 
       overflow:auto;
-      max-height: calc(70vh); 
-      
-      /* Esta é a correção principal: */
+      max-height: calc(70vh);
       min-height: 360px;
     }
-    /* Removido: .step-pane.active e 'position: absolute' */
-    /* --- FIM DA CORREÇÃO --- */
+    .step-pane.active {
+      display: block; /* Exibe apenas o passo ativo */
+    }
 
 
     .step-counter{ 
@@ -577,11 +573,9 @@
         stepIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
         currentStep = stepIndex;
 
-        // --- [CORREÇÃO APLICADA] ---
-        // Lógica de deslizar (transform) está de volta
-        const offset = -currentStep * 100;
-        wizardTrack.style.transform = `translateX(${offset}%)`;
-        // --- FIM DA CORREÇÃO ---
+        stepPanes.forEach((pane, index) => {
+          pane.classList.toggle('active', index === currentStep);
+        });
         
         prevBtn.disabled = currentStep === 0;
         nextBtn.disabled = false;
