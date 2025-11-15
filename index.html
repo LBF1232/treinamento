@@ -8,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 
   <style>
-    /* --- CORES E VARIÁVEIS (Copiado do seu arquivo) --- */
+    /* --- CORES E VARIÁVEIS --- */
     :root{
       --novo-1: #F37021; --novo-2: #005A9C;
       --mateus-1: #D62828; --mateus-2: #F7B733;
@@ -20,11 +20,11 @@
       --radius: 20px;
       --text: #111;
       --muted: #555;
-      --max-width: 1200px; /* Mais largo para um dashboard */
+      --max-width: 1200px; 
       --gap: 1.25rem;
     }
 
-    /* --- ESTILOS GLOBAIS (Copiado do seu arquivo) --- */
+    /* --- ESTILOS GLOBAIS --- */
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
     }
@@ -40,7 +40,7 @@
       transition: background 1s ease-in-out;
     }
 
-    /* --- NOVO LAYOUT (Sidebar + Conteúdo) --- */
+    /* --- LAYOUT (Sidebar + Conteúdo) --- */
     .layout-container {
       display: flex;
       width: 100%;
@@ -50,7 +50,7 @@
       position: relative;
     }
 
-    /* --- NOVA SIDEBAR --- */
+    /* --- SIDEBAR --- */
     .sidebar {
       flex: 0 0 240px;
       padding: 1.5rem;
@@ -197,14 +197,13 @@
       display: flex;
       flex-direction: column;
     }
-    
     .catalog-wrap {
       width: 100%;
-      height: auto;
+      height: 100%;
       background: var(--card-bg); 
       border-radius: var(--radius);
       box-shadow: 0 18px 50px rgba(0,0,0,0.18);
-      overflow: visible;
+      overflow: auto; 
       border: 1px solid rgba(255,255,255,0.6);
       padding: 1.5rem 2rem;
     }
@@ -223,9 +222,8 @@
     .training-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
-
     .training-card {
       display: flex;
       flex-direction: column;
@@ -234,45 +232,53 @@
       background: #FFFFFF; 
       border-radius: 14px;
       padding: 1rem;
-      border: 1px solid rgba(0,0,0,0.08); 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+      border: 1px solid rgba(0,0,0,0.05); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
       transition: all 0.25s ease;
       min-height: 200px; 
     }
     .training-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       border-color: var(--novo-2);
     }
-    
     .card-icon {
       height: 120px; 
+      display: grid;
+      place-items: center;
+      font-size: 3.5rem;
       background: #f0f2f5; 
       border-radius: 10px;
       color: var(--novo-2);
       overflow: hidden; 
-      display: grid; 
-      place-items: center; 
     }
-    
     .card-icon img {
       width: 100%;
       height: 100%;
       object-fit: cover; 
     }
 
-    .fallback {
-      font-size: 1rem;
-      color: var(--novo-2);
+    /* --- ESTILO FALLBACK --- */
+    .card-icon.fallback {
+      background: #f0f2f5; 
+      border: 1px solid rgba(0,0,0,0.05);
+      font-size: 1.1rem; 
       font-weight: 700;
-      padding: .8rem;
+      color: var(--novo-2);
+      padding: 1rem;
       text-align: center;
+      line-height: 1.4;
+      display: flex; 
+      align-items: center;
+      justify-content: center;
     }
-    
+    /* --- FIM ESTILO FALLBACK --- */
+
+
     .card-title {
       font-size: 1rem;
       font-weight: 600;
-      color: var(--text); 
+      color: var(--text);
       text-align: center;
       min-height: 2.5em; 
       display: flex;
@@ -280,7 +286,7 @@
       justify-content: center;
     }
     
-    /* Responsivo */
+    /* Responsivo simples */
     @media (max-width: 800px) {
       body { padding: 0; }
       .layout-container {
@@ -311,7 +317,7 @@
       .links-popup {
         left: 1rem;
         bottom: auto;
-        top: 60px; 
+        top: 60px; /* Abaixo do header */
         width: calc(100% - 2rem);
       }
     }
@@ -352,7 +358,7 @@
             </div>
             <span class="card-title">Formatação de PDV</span>
           </a>
-          
+
           <a href="#" class="training-card" aria-label="Iniciar treinamento: Gestão de Estoque (WMS)">
             <div class="card-icon fallback">
               Gestão de Estoque (WMS)
@@ -360,11 +366,11 @@
             <span class="card-title">Gestão de Estoque (WMS)</span>
           </a>
 
-          <a href="#" class="training-card" aria-label="Iniciar treinamento: Operação de Caixa">
-            <div class="card-icon fallback">
-              Operação de Caixa
+          <a href="treinamento-balanca.html" class="training-card" aria-label="Iniciar treinamento: Configuração de Balança">
+            <div class="card-icon">
+              <img src="img/balanca.png" alt="Ilustração de uma balança">
             </div>
-            <span class="card-title">Operação de Caixa</span>
+            <span class="card-title">Configuração de Balança</span>
           </a>
 
           <a href="#" class="training-card" aria-label="Iniciar treinamento: Recebimento de Mercadoria">
@@ -373,7 +379,6 @@
             </div>
             <span class="card-title">Recebimento de Mercadoria</span>
           </a>
-          
           
           <a href="#" class="training-card" aria-label="Iniciar treinamento: Troca e Devolução">
             <div class="card-icon fallback">
@@ -388,8 +393,8 @@
             </div>
             <span class="card-title">Emissão de Notas Fiscais</span>
           </a>
-
-        </div>
+          
+          </div>
       </div>
     </main>
 
@@ -462,7 +467,7 @@
       const linksBtn = document.getElementById('linksBtn');
       const linksPopup = document.getElementById('linksPopup');
 
-      if (linksBtn && linksPopup) { // <-- Adicionada verificação
+      if (linksBtn && linksPopup) {
         linksBtn.addEventListener('click', (e) => {
           e.stopPropagation(); 
           const isVisible = linksPopup.classList.toggle('visible');
@@ -473,7 +478,7 @@
             gsap.fromTo(linksPopup, {opacity:0, y:-10}, {opacity:1, y:0, duration:0.3, ease:'power2.out'});
           }
         });
-      } // <-- Fim da verificação
+      }
 
       // Fechar ao clicar fora do pop-up
       document.addEventListener('click', (e) => {
@@ -517,10 +522,8 @@
       });
 
 
-      /*
-      // --- [SEÇÃO REMOVIDA] ---
-      // Esta animação estava causando o desaparecimento dos cards.
       // --- Animações de Entrada (GSAP) ---
+      // (Removida a animação dos cards que estava causando o bug de "sumir")
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         // Anima a sidebar
         gsap.from('.sidebar', {
@@ -533,14 +536,7 @@
           duration: 0.8, y: 50, opacity: 0, 
           ease: 'power2.out', delay: 0.4
         });
-        
-        // Anima os cards do catálogo em sequência
-        gsap.from('.training-card', {
-          duration: 0.5, y: 30, opacity: 0, 
-          ease: 'power2.out', stagger: 0.1, delay: 0.7
-        });
       }
-      */
     });
   </script>
 </body>
