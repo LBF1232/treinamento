@@ -124,24 +124,27 @@
       width:100%; 
       min-height:360px; /* Garante que o container tenha altura */
       position:relative; 
-      overflow: hidden; /* Esconde os outros slides */
+      /* overflow: hidden; */ /* Não é mais necessário com display:none */
     }
     .wizard-track{ 
-      display:flex; /* Coloca os slides um ao lado do outro */
+      /* display:flex; */ /* Removido */
       width:100%; 
       height: 100%;
-      transition: transform 0.6s cubic-bezier(.22,.9,.2,1); 
+      /* transition: transform 0.6s cubic-bezier(.22,.9,.2,1); */ /* Removido */
     }
 
     .step-pane{
       width:100%; 
-      flex: 0 0 100%; /* Cada slide ocupa 100% da largura */
+      /* flex: 0 0 100%; */ /* Removido */
       padding:1.25rem 1.5rem 1.75rem 1.5rem; 
       overflow:auto;
       max-height: calc(70vh); 
       min-height: 360px; /* Garante que todos os slides tenham a mesma altura */
-      display: flex;
+      display: none; /* Escondido por padrão */
       flex-direction: column;
+    }
+    .step-pane.active {
+      display: flex; /* Mostra o slide ativo */
     }
 
 
@@ -402,15 +405,17 @@
           <div class="step-counter">Etapa 2 de 4</div>
           <h2 id="step2title">Abertura de um Novo Chamado (Usuário)</h2>
           <p>No menu principal, navegue até "Formulários" ou "TI - Chamados" e selecione o formulário específico (Ex: TI - PDV).</p>
-          <h3>Preencha os Campos Obrigatórios:</h3>
-          <ul>
-            <li><strong>Localização:</strong> Informe a sua Loja e Matriz.</li>
-            <li><strong>Setor do PDV:</strong> (Ex: Frente de Caixa, Delivery).</li>
-            <li><strong>Número do PDV:</strong> (Ex: 02, 06).</li>
-            <li><strong>Parte com Problema:</strong> (Ex: Teclado, Leitor de Mão, Balança).</li>
-            <li><strong>Tipo de Problema:</strong> (Ex: TECLA NÃO FUNCIONA).</li>
-            <li><strong>Descrição Geral:</strong> Descreva o problema de forma clara (Ex: "A tecla 'Enter' parou de funcionar").</li>
-          </ul>
+          <div class="info-block">
+            <h3>Preencha os Campos Obrigatórios:</h3>
+            <ol>
+              <li><strong>Localização:</strong> Informe a sua Loja e Matriz.</li>
+              <li><strong>Setor do PDV:</strong> (Ex: Frente de Caixa, Delivery).</li>
+              <li><strong>Número do PDV:</strong> (Ex: 02, 06).</li>
+              <li><strong>Parte com Problema:</strong> (Ex: Teclado, Leitor de Mão, Balança).</li>
+              <li><strong>Tipo de Problema:</strong> (Ex: TECLA NÃO FUNCIONA).</li>
+              <li><strong>Descrição Geral:</strong> Descreva o problema de forma clara (Ex: "A tecla 'Enter' parou de funcionar").</li>
+            </ol>
+          </div>
           <p>Clique em "Enviar" para abrir o chamado.</p>
           <div class="warning-block">
             <strong>⚠️ Alerta de Urgência (Rádio):</strong> Em casos de urgência (PDV parado), comunique a TI via rádio, mas <strong>sempre</strong> formalize o chamado no portal logo em seguida.
@@ -518,34 +523,24 @@
 
       const totalSteps = stepPanes.length;
       let currentStep = 0;
-      
-      // Trava de animação
-      let isAnimating = false;
-      // Duração da animação (600ms = 0.6s do seu CSS)
-      const animationDuration = 600; 
 
       // --- Função: mostrar etapa ---
       function showStep(stepIndex, opts = {}) {
-        
-        // Se estiver animando, ignora o clique
-        if (isAnimating && !opts.force) return;
-
         stepIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
         
-        // Se já estiver na etapa, não faz nada
+        // Se já estiver na etapa, não faz nada (a menos que seja forçado)
         if (stepIndex === currentStep && !opts.force) {
-            // Se for forçado (primeiro load), libera a trava
-            if(opts.force) isAnimating = false;
             return;
         }
 
-        // Ativa a trava
-        isAnimating = true;
         currentStep = stepIndex;
 
-        // Lógica de "deslizar" (transform)
-        const offset = -currentStep * 100;
-        wizardTrack.style.transform = `translateX(${offset}%)`;
+        // Lógica de mostrar/esconder com classe .active
+        stepPanes.forEach((pane, index) => {
+          pane.classList.toggle('active', index === currentStep);
+          // Acessibilidade: esconde os inativos para leitores de tela
+          pane.setAttribute('aria-hidden', index !== currentStep);
+        });
         
         prevBtn.disabled = currentStep === 0;
         nextBtn.disabled = false;
@@ -570,14 +565,14 @@
 
         const currentPane = stepPanes[currentStep];
         if(currentPane) {
+          // Garante que o painel ativo seja focável
+          currentPane.setAttribute('tabindex', '-1');
+
           currentPane.querySelectorAll('button, [tabindex], a, input').forEach(el => el.setAttribute('tabindex','0'));
-          currentPane.focus?.();
+
+          // Foca no painel para controle via teclado e leitura de tela
+          currentPane.focus();
         }
-        
-        // Libera a trava após a animação de 0.6s terminar
-        setTimeout(() => {
-            isAnimating = false;
-        }, animationDuration);
       }
 
       // --- Next / Prev ---
