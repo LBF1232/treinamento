@@ -358,15 +358,12 @@
 </head>
 <body>
 
-  <!-- 1. WIZARD -->
   <div class="wizard-wrap" role="application" aria-labelledby="wizardTitle">
     <header class="wizard-header">
       <div class="wizard-title">
         <a href="index.html" class="back-btn" aria-label="Voltar ao catálogo">&larr;</a>
-        <!-- Ícone Atualizado -->
         <div class="brand-badge" aria-hidden="true">📞</div>
         <div>
-          <!-- Título Atualizado -->
           <h1 id="wizardTitle">POP: Abertura e Gestão de Chamados de TI</h1>
           <div class="wizard-meta">Service Desk</div>
         </div>
@@ -376,7 +373,6 @@
         <div class="progress-bar" id="progressBar" style="width:0%"></div>
       </div>
 
-      <!-- [MODIFICADO] Stepper de 4 etapas -->
       <nav class="stepper-nav" id="stepperNav" aria-label="Navegação das etapas" role="navigation">
         <button class="stepper-btn active" data-step-index="0">1. Acesso (Usuário)</button>
         <button class="stepper-btn" data-step-index="1">2. Abertura (Usuário)</button>
@@ -388,7 +384,6 @@
     <main class="wizard-body" id="wizardBody">
       <div class="wizard-track" id="wizardTrack" aria-live="polite" aria-atomic="true">
 
-        <!-- ETAPA 1: Acesso (Usuário) -->
         <section class="step-pane" role="region" aria-labelledby="step1title">
           <div class="step-counter">Etapa 1 de 4</div>
           <h2 id="step1title">Acesso ao Portal (Usuário Padrão)</h2>
@@ -403,7 +398,6 @@
           </ol>
         </section>
 
-        <!-- ETAPA 2: Abertura (Usuário) -->
         <section class="step-pane" role="region" aria-labelledby="step2title">
           <div class="step-counter">Etapa 2 de 4</div>
           <h2 id="step2title">Abertura de um Novo Chamado (Usuário)</h2>
@@ -423,7 +417,6 @@
           </div>
         </section>
 
-        <!-- ETAPA 3: Gestão (Técnico) -->
         <section class="step-pane" role="region" aria-labelledby="step3title">
           <div class="step-counter">Etapa 3 de 4</div>
           <h2 id="step3title">Gestão e Resolução (Perfil Técnico)</h2>
@@ -441,7 +434,6 @@
           </ol>
         </section>
 
-        <!-- ETAPA 4: Acompanhamento -->
         <section class="step-pane" role="region" aria-labelledby="step4title">
           <div class="step-counter">Etapa 4 de 4</div>
           <h2 id="step4title">Acompanhamento (Usuário Padrão)</h2>
@@ -458,7 +450,6 @@
     </main>
 
     <footer class="wizard-footer" role="contentinfo">
-      <!-- Footer Atualizado -->
       <div class="step-indicator" id="stepIndicator" aria-live="polite">Etapa 1 / 4</div>
       <div class="wizard-navigation" aria-hidden="false">
         <button id="prevBtn" class="btn" aria-label="Etapa anterior">Anterior</button>
@@ -467,30 +458,25 @@
     </footer>
   </div>
 
-  <!-- [MODIFICADO] 2. EXTRAS (DOWNLOAD E VÍDEO) -->
   <div class="extras-wrap">
     
-    <!-- Caixa de Download -->
     <div class="download-box">
       <h3>Download do POP</h3>
       <div class="info-block">
         <small>Clique no botão abaixo para baixar a versão em PDF deste procedimento.</small>
       </div>
       
-      <!-- Botão de Download (com nome do PDF corrigido) -->
       <a href="pdf/chamado.pdf" class="download-btn-pdf" aria-label="Baixar POP em PDF" download>
         &#x21E9; Baixar PDF
       </a>
       
     </div>
 
-    <!-- Caixa do Vídeo -->
     <div class="video-box">
       <h3>Vídeo de Referência</h3>
       <div class="video-container">
-        <!-- URL do vídeo atualizada -->
         <iframe 
-          src="https://www.youtube.com/watch?v=eoLZmztsrgY" 
+          src="https://www.youtube.com/embed/eoLZmztsrgY" 
           title="YouTube video player" 
           frameborder="0" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -502,13 +488,11 @@
   </div>
 
 
-  <!-- 3. SCRIPTS -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Visualização ampliada">
     <button class="close-lightbox" id="closeLightbox" aria-label="Fechar visualização">&times;</button>
     <div class="lightbox-content" id="lightboxContent" tabindex="0"></div>
   </div>
 
-  <!-- Script com a "trava" (isAnimating) para prevenir o bug de clique rápido -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
