@@ -190,6 +190,121 @@
     }
     .go-btn:active { transform: scale(0.95); }
 
+    /* --- [CORREÇÃO] POP-UP DE COMANDOS --- */
+    #comandosPopup {
+      width: 420px; 
+      bottom: auto; 
+      top: 1.5rem; 
+      
+      /* Correção para evitar quebra de layout: */
+      max-height: calc(90vh - 4rem); /* Altura máxima igual a do app */
+      overflow-y: auto; /* Adiciona scroll interno se o conteúdo for maior */
+      overflow-x: hidden;
+    }
+
+    #comandosPopup h4 {
+      margin: 1.25rem 0.5rem 0.5rem 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding-bottom: 5px;
+    }
+    #comandosPopup h4:first-of-type {
+      margin-top: 0.25rem;
+    }
+
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 0.5rem;
+      border-radius: 8px;
+      flex-wrap: wrap; /* Para o acordeão */
+    }
+    .cmd-item:not(.expandable):hover {
+       background: rgba(0,0,0,0.04);
+    }
+
+    .cmd-item strong {
+      flex-shrink: 0;
+      font-family: ui-monospace, "Courier New", monospace;
+      background: rgba(0,0,0,0.08);
+      color: var(--novo-1);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .cmd-item span {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Estilos do Acordeão */
+    .cmd-item.expandable {
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.05);
+      margin-bottom: 0.5rem;
+      padding: 0; /* Padding será no header/body */
+    }
+    
+    .cmd-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      cursor: pointer;
+      padding: 0.6rem 0.8rem; /* Padding do header */
+    }
+    .cmd-item-header span:first-child {
+      font-weight: 600;
+      color: var(--novo-2);
+    }
+    .cmd-item-header .arrow {
+      font-size: 0.8rem;
+      font-weight: 900;
+      transition: transform 0.3s ease;
+      color: var(--novo-2);
+    }
+    
+    .cmd-item-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out, padding 0.3s ease, margin 0.3s ease;
+      width: 100%;
+      padding: 0 0.8rem;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .cmd-item-body p { margin: 0.5rem 0; }
+    .cmd-item-body ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+    .cmd-item-body li { margin-bottom: 0.5rem; }
+    .cmd-item-body code {
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, "Courier New", monospace;
+    }
+    .cmd-item-body small {
+      display: block;
+      margin-top: 0.75rem;
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .cmd-item.expanded .cmd-item-body {
+      max-height: 500px; /* Altura suficiente */
+      padding: 0.5rem 0.8rem 1rem 0.8rem;
+      margin-top: -5px; /* Puxa para perto do header */
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    .cmd-item.expanded .arrow {
+      transform: rotate(180deg);
+    }
+    /* --- FIM DOS ESTILOS NOVOS --- */
+
 
     /* --- CONTEÚDO PRINCIPAL (Catálogo) --- */
     .main-content {
@@ -272,8 +387,6 @@
       align-items: center;
       justify-content: center;
     }
-    /* --- FIM ESTILO FALLBACK --- */
-
 
     .card-title {
       font-size: 1rem;
@@ -286,7 +399,7 @@
       justify-content: center;
     }
     
-    /* Responsivo simples */
+    /* Responsivo */
     @media (max-width: 800px) {
       body { padding: 0; }
       .layout-container {
@@ -320,6 +433,13 @@
         top: 60px; /* Abaixo do header */
         width: calc(100% - 2rem);
       }
+      /* Responsivo para novo popup */
+       #comandosPopup {
+        top: 60px;
+        left: 1rem;
+        width: calc(100% - 2rem);
+        max-height: calc(100vh - 70px); /* Altura máxima em mobile */
+      }
     }
 
   </style>
@@ -341,6 +461,10 @@
         <button class="nav-btn" id="linksBtn" aria-haspopup="true">
           <span>🔗</span>
           <span>Links</span>
+        </button>
+        <button class="nav-btn" id="comandosBtn" aria-haspopup="true">
+          <span>⌨️</span>
+          <span>Comando PDV</span>
         </button>
       </nav>
       <div style="flex:1;"></div> </aside>
@@ -456,35 +580,152 @@
           <button class="go-btn" data-link="https://rh.novomateus.com.br">Acessar</button>
         </div>
       </div>
-
     </div>
+    
+    <div class="links-popup" id="comandosPopup" role="dialog" aria-labelledby="comandosTitle">
+      <h3 id="comandosTitle">Comandos PDV (Acrux)</h3>
+      
+      <h4>Comandos de Operação</h4>
+      <div class="cmd-item">
+        <strong>A</strong>
+        <span>Abrir caixa</span>
+      </div>
+      <div class="cmd-item">
+        <strong>F</strong>
+        <span>Fechar caixa</span>
+      </div>
+      <div class="cmd-item">
+        <strong>H</strong>
+        <span>Consultar Cupom</span>
+      </div>
+      <div class="cmd-item">
+        <strong>C</strong>
+        <span>Abrir chamado (frente de loja)</span>
+      </div>
+      <div class="cmd-item">
+        <strong>X</strong>
+        <span>Leitura X (Teste de Impressora)</span>
+      </div>
+
+      <h4>Comandos de Manutenção</h4>
+      
+      <div class="cmd-item expandable">
+        <div class="cmd-item-header">
+          <span><strong>Reiniciar Aplicação</strong> (Derrubar)</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="cmd-item-body">
+          <p>Força o fechamento e reabertura do software do PDV.</p>
+          <ol>
+            <li>Pressione <strong>Alt + F2</strong></li>
+            <li>Digite: <code>killall AcruxPDV</code></li>
+            <li>Pressione <strong>Enter</strong>.</li>
+            <li>Pressione <strong>Alt + F2</strong> novamente.</li>
+            <li>Digite: <code>acruxpdv</code></li>
+            <li>Pressione <strong>Enter</strong>.</li>
+          </ol>
+          <small>Atenção: Comandos sensíveis a maiúsculas/minúsculas.</small>
+        </div>
+      </div>
+      
+      <div class="cmd-item expandable">
+        <div class="cmd-item-header">
+          <span><strong>Configurar Layout Teclado</strong></span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="cmd-item-body">
+          <p>Ajusta o sistema ao tipo de teclado conectado.</p>
+          <ol>
+            <li>Pressione <strong>Ctrl + Alt + Shift + T</strong></li>
+            <li>Escolha a opção correspondente:
+              <ul>
+                <li><strong>Padrão A:</strong> Teclado USB</li>
+                <li><strong>Padrão B:</strong> Teclados Smark e Sweda</li>
+              </ul>
+            </li>
+            <li>Pressione <strong>F10</strong> para salvar.</li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="cmd-item expandable">
+        <div class="cmd-item-header">
+          <span><strong>Configurar Portas</strong> (Periféricos)</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="cmd-item-body">
+          <p>Acessa o menu de configuração de portas (impressora, scanner).</p>
+          <ol>
+            <li>Pressione a tecla <strong>;</strong> (ponto e vírgula).</li>
+            <li>O menu de configuração será exibido.</li>
+          </ol>
+        </div>
+      </div>
+      
+    </div>
+    
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      // --- Script do Pop-up de Links ---
+      // --- [MODIFICADO] Script dos Pop-ups ---
       const linksBtn = document.getElementById('linksBtn');
       const linksPopup = document.getElementById('linksPopup');
+      
+      const comandosBtn = document.getElementById('comandosBtn');
+      const comandosPopup = document.getElementById('comandosPopup');
 
-      if (linksBtn && linksPopup) {
-        linksBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); 
-          const isVisible = linksPopup.classList.toggle('visible');
-          linksBtn.setAttribute('aria-expanded', isVisible);
+      // Função para abrir um popup e fechar o outro
+      function togglePopup(popupToShow, btnToShow) {
+          const allPopups = [linksPopup, comandosPopup];
+          const allBtns = [linksBtn, comandosBtn];
           
-          // Animação com GSAP
+          let isVisible;
+
+          allPopups.forEach((p, index) => {
+              if (p === popupToShow) {
+                  isVisible = p.classList.toggle('visible');
+                  btnToShow.setAttribute('aria-expanded', isVisible);
+              } else {
+                  p.classList.remove('visible');
+                  // Garante que o outro botão também seja atualizado
+                  if(allBtns[index]) allBtns[index].setAttribute('aria-expanded', 'false');
+              }
+          });
+
           if (isVisible) {
-            gsap.fromTo(linksPopup, {opacity:0, y:-10}, {opacity:1, y:0, duration:0.3, ease:'power2.out'});
+              gsap.fromTo(popupToShow, {opacity:0, y:-10}, {opacity:1, y:0, duration:0.3, ease:'power2.out'});
           }
+      }
+
+      if(linksBtn && linksPopup) {
+        linksBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePopup(linksPopup, linksBtn);
+        });
+      }
+      
+      if(comandosBtn && comandosPopup) {
+        comandosBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePopup(comandosPopup, comandosBtn);
         });
       }
 
-      // Fechar ao clicar fora do pop-up
+      // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
-        if (linksPopup && !linksPopup.contains(e.target) && e.target !== linksBtn) {
-          linksPopup.classList.remove('visible');
+        // Verifica se o clique foi fora de AMBOS os pop-ups
+        const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
+        const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
+        const isLinksBtn = e.target === linksBtn;
+        const isComandosBtn = e.target === comandosBtn;
+
+        if (!isClickInsideLinks && !isClickInsideComandos && !isLinksBtn && !isComandosBtn) {
+          if(linksPopup) linksPopup.classList.remove('visible');
+          if(comandosPopup) comandosPopup.classList.remove('visible');
           if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
+          if(comandosBtn) comandosBtn.setAttribute('aria-expanded', 'false');
         }
       });
 
@@ -520,10 +761,19 @@
           }
         });
       });
+      
+      // --- [NOVO] Script do Acordeão de Comandos ---
+      document.querySelectorAll('.cmd-item.expandable').forEach(item => {
+        const header = item.querySelector('.cmd-item-header');
+        if(header) {
+          header.addEventListener('click', () => {
+            item.classList.toggle('expanded');
+          });
+        }
+      });
 
 
       // --- Animações de Entrada (GSAP) ---
-      // (Removida a animação dos cards que estava causando o bug de "sumir")
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         // Anima a sidebar
         gsap.from('.sidebar', {
