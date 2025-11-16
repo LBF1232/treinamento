@@ -104,6 +104,7 @@
       align-items: center;
       gap: 0.75rem;
       transition: background 0.2s ease, color 0.2s ease;
+      text-decoration: none; /* Para o <a> de Download */
     }
     .nav-btn:hover {
       background: rgba(255,255,255,0.1);
@@ -114,6 +115,14 @@
       color: var(--novo-2);
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+    /* [NOVO] Estilo para o botão de download */
+    .nav-btn.download-link {
+      font-size: 0.9rem; /* Texto um pouco menor para caber */
+      line-height: 1.3;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
 
     /* --- POP-UP DE LINKS --- */
     .links-popup {
@@ -196,8 +205,8 @@
       bottom: auto; 
       top: 1.5rem; 
       
-      max-height: calc(90vh - 4rem); /* Altura máxima igual a do app */
-      overflow-y: auto; /* Adiciona scroll interno se o conteúdo for maior */
+      max-height: calc(90vh - 4rem); 
+      overflow-y: auto; 
       overflow-x: hidden;
     }
 
@@ -234,6 +243,7 @@
       padding: 3px 8px;
       border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.1);
+      word-break: break-all; /* Quebra comandos longos */
     }
     .cmd-item span {
       font-weight: 600;
@@ -302,7 +312,34 @@
     .cmd-item.expanded .arrow {
       transform: rotate(180deg);
     }
-    /* --- FIM DOS ESTILOS NOVOS --- */
+    
+    /* --- [NOVO] POP-UP DE CONTATOS --- */
+    #contatoPopup {
+      width: 400px; 
+      bottom: auto; 
+      top: 1.5rem; 
+      /* Posição diferente dos outros */
+      left: calc(240px + 1.5rem + 1rem + 420px + 1rem); 
+    }
+    
+    .contato-item {
+      padding: 0.8rem;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .contato-item:last-child {
+      border-bottom: none;
+    }
+    .contato-item strong {
+      display: block;
+      font-size: 1.1rem;
+      color: var(--novo-2);
+      margin-bottom: 0.25rem;
+    }
+    .contato-item p {
+      margin: 0;
+      font-weight: 600;
+      color: var(--text);
+    }
 
 
     /* --- CONTEÚDO PRINCIPAL (Catálogo) --- */
@@ -420,6 +457,10 @@
       .sidebar-title { font-size: 1.1rem; }
       .sidebar-nav { flex-direction: row; }
       .nav-btn { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
+      /* Responsivo para link de download */
+      .nav-btn.download-link {
+        display: none; /* Esconde o botão de download longo em telas pequenas */
+      }
       
       .catalog-wrap {
         border-radius: var(--radius) var(--radius) 0 0;
@@ -432,8 +473,8 @@
         top: 60px; /* Abaixo do header */
         width: calc(100% - 2rem);
       }
-      /* Responsivo para novo popup */
-       #comandosPopup {
+      /* Responsivo para novos popups */
+       #comandosPopup, #contatoPopup {
         top: 60px;
         left: 1rem;
         width: calc(100% - 2rem);
@@ -465,7 +506,15 @@
           <span>⌨️</span>
           <span>Comando PDV</span>
         </button>
+        <button class="nav-btn" id="contatoBtn" aria-haspopup="true">
+          <span>📞</span>
+          <span>Contato Regional</span>
+        </button>
       </nav>
+      <a href="https://drive.google.com/drive/folders/1pOh4G00xKVwG0NV5VXTM4krAPy9Y_XUJ" target="_blank" class="nav-btn download-link">
+          <span>📱</span>
+          <span>Download App Novo Mateus</span>
+       </a>
       <div style="flex:1;"></div> </aside>
 
     <main class="main-content">
@@ -503,11 +552,11 @@
             <span class="card-title">Carga de Balança e MGV</span>
           </a>
           
-          <a href="#" class="training-card" aria-label="Iniciar treinamento: Troca e Devolução">
-            <div class="card-icon fallback">
-              Troca e Devolução
+          <a href="treinamento-chamado.html" class="training-card" aria-label="Iniciar treinamento: Abertura de Chamado">
+            <div class="card-icon">
+              <img src="img/chamado.png" alt="Ilustração de Abertura de Chamado">
             </div>
-            <span class="card-title">Troca e Devolução</span>
+            <span class="card-title">Abertura de Chamado</span>
           </a>
 
           <a href="#" class="training-card" aria-label="Iniciar treinamento: Emissão de Notas Fiscais">
@@ -608,6 +657,18 @@
 
       <h4>Comandos de Manutenção</h4>
       
+      <div class="cmd-item">
+        <strong>Alt + F2</strong>
+        <span>Abre caixa de texto</span>
+      </div>
+      <div class="cmd-item">
+        <strong>term</strong>
+        <span>Abre terminal</span>
+      </div>
+      <div class="cmd-item">
+        <strong>ls -ln /dev/ttyS*</strong>
+        <span>Lista periféricos (portas COM)</span>
+      </div>
       <div class="cmd-item expandable">
         <div class="cmd-item-header">
           <span><strong>Reiniciar Aplicação</strong> (Derrubar)</span>
@@ -663,22 +724,42 @@
       
     </div>
     
+    <div class="links-popup" id="contatoPopup" role="dialog" aria-labelledby="contatoTitle">
+      <h3 id="contatoTitle">Contatos Regionais</h3>
+      
+      <div class="contato-item">
+        <strong>Sitef: Martins</strong>
+        <p>TGV Sitef: 34 3218-1788</p>
+        <p>Celular: 34 9912-7261</p>
+      </div>
+      
+      <div class="contato-item">
+        <strong>Rede</strong>
+        <p>Contato: 11 4001-4433</p>
+      </div>
+      
+    </div>
+    
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      // --- Script dos Pop-ups ---
+      // --- [MODIFICADO] Script dos Pop-ups ---
       const linksBtn = document.getElementById('linksBtn');
       const linksPopup = document.getElementById('linksPopup');
       
       const comandosBtn = document.getElementById('comandosBtn');
       const comandosPopup = document.getElementById('comandosPopup');
+      
+      // [NOVO] Variáveis de Contato
+      const contatoBtn = document.getElementById('contatoBtn');
+      const contatoPopup = document.getElementById('contatoPopup');
 
-      // Função para abrir um popup e fechar o outro
+      // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
-          const allPopups = [linksPopup, comandosPopup];
-          const allBtns = [linksBtn, comandosBtn];
+          const allPopups = [linksPopup, comandosPopup, contatoPopup];
+          const allBtns = [linksBtn, comandosBtn, contatoBtn];
           
           let isVisible;
 
@@ -687,7 +768,7 @@
                   isVisible = p.classList.toggle('visible');
                   btnToShow.setAttribute('aria-expanded', isVisible);
               } else {
-                  p.classList.remove('visible');
+                  if(p) p.classList.remove('visible');
                   if(allBtns[index]) allBtns[index].setAttribute('aria-expanded', 'false');
               }
           });
@@ -710,19 +791,34 @@
           togglePopup(comandosPopup, comandosBtn);
         });
       }
+      
+      // [NOVO] Event listener para o botão de Contato
+      if(contatoBtn && contatoPopup) {
+        contatoBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePopup(contatoPopup, contatoBtn);
+        });
+      }
 
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
+        // Verifica se o clique foi fora de TODOS os pop-ups e botões
         const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
         const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
+        const isClickInsideContato = contatoPopup && contatoPopup.contains(e.target);
+        
         const isLinksBtn = e.target === linksBtn;
         const isComandosBtn = e.target === comandosBtn;
+        const isContatoBtn = e.target === contatoBtn;
 
-        if (!isClickInsideLinks && !isClickInsideComandos && !isLinksBtn && !isComandosBtn) {
+        if (!isClickInsideLinks && !isClickInsideComandos && !isClickInsideContato && !isLinksBtn && !isComandosBtn && !isContatoBtn) {
           if(linksPopup) linksPopup.classList.remove('visible');
           if(comandosPopup) comandosPopup.classList.remove('visible');
+          if(contatoPopup) contatoPopup.classList.remove('visible');
+          
           if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
           if(comandosBtn) comandosBtn.setAttribute('aria-expanded', 'false');
+          if(contatoBtn) contatoBtn.setAttribute('aria-expanded', 'false');
         }
       });
 
