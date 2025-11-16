@@ -115,7 +115,6 @@
       color: var(--novo-2);
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    /* [NOVO] Estilo para o botão de download */
     .nav-btn.download-link {
       font-size: 0.9rem; /* Texto um pouco menor para caber */
       line-height: 1.3;
@@ -313,12 +312,11 @@
       transform: rotate(180deg);
     }
     
-    /* --- [NOVO] POP-UP DE CONTATOS --- */
+    /* --- POP-UP DE CONTATOS --- */
     #contatoPopup {
       width: 400px; 
       bottom: auto; 
       top: 1.5rem; 
-      /* Posição diferente dos outros */
       left: calc(240px + 1.5rem + 1rem + 420px + 1rem); 
     }
     
@@ -457,9 +455,8 @@
       .sidebar-title { font-size: 1.1rem; }
       .sidebar-nav { flex-direction: row; }
       .nav-btn { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
-      /* Responsivo para link de download */
       .nav-btn.download-link {
-        display: none; /* Esconde o botão de download longo em telas pequenas */
+        display: none; 
       }
       
       .catalog-wrap {
@@ -473,12 +470,11 @@
         top: 60px; /* Abaixo do header */
         width: calc(100% - 2rem);
       }
-      /* Responsivo para novos popups */
        #comandosPopup, #contatoPopup {
         top: 60px;
         left: 1rem;
         width: calc(100% - 2rem);
-        max-height: calc(100vh - 70px); /* Altura máxima em mobile */
+        max-height: calc(100vh - 70px); 
       }
     }
 
@@ -511,7 +507,7 @@
           <span>Contato Regional</span>
         </button>
       </nav>
-      <a href="https://drive.google.com/drive/folders/1pOh4G00xKVwG0NV5VXTM4krAPy9Y_XUJ" target="_blank" class="nav-btn download-link">
+       <a href="https://drive.google.com/drive/folders/1pOh4G00xKVwG0NV5VXTM4krAPy9Y_XUJ" target="_blank" class="nav-btn download-link">
           <span>📱</span>
           <span>Download App Novo Mateus</span>
        </a>
@@ -559,11 +555,11 @@
             <span class="card-title">Abertura de Chamado</span>
           </a>
 
-          <a href="#" class="training-card" aria-label="Iniciar treinamento: Emissão de Notas Fiscais">
-            <div class="card-icon fallback">
-              Emissão de Notas Fiscais
+          <a href="treinamento-auditoria.html" class="training-card" aria-label="Iniciar treinamento: Auditoria - Coletor">
+            <div class="card-icon">
+              <img src="img/coletor.png" alt="Ilustração de um coletor de dados">
             </div>
-            <span class="card-title">Emissão de Notas Fiscais</span>
+            <span class="card-title">Auditoria - Coletor</span>
           </a>
           
           </div>
@@ -669,6 +665,7 @@
         <strong>ls -ln /dev/ttyS*</strong>
         <span>Lista periféricos (portas COM)</span>
       </div>
+      
       <div class="cmd-item expandable">
         <div class="cmd-item-header">
           <span><strong>Reiniciar Aplicação</strong> (Derrubar)</span>
@@ -745,14 +742,13 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      // --- [MODIFICADO] Script dos Pop-ups ---
+      // --- Script dos Pop-ups ---
       const linksBtn = document.getElementById('linksBtn');
       const linksPopup = document.getElementById('linksPopup');
       
       const comandosBtn = document.getElementById('comandosBtn');
       const comandosPopup = document.getElementById('comandosPopup');
       
-      // [NOVO] Variáveis de Contato
       const contatoBtn = document.getElementById('contatoBtn');
       const contatoPopup = document.getElementById('contatoPopup');
 
@@ -766,7 +762,7 @@
           allPopups.forEach((p, index) => {
               if (p === popupToShow) {
                   isVisible = p.classList.toggle('visible');
-                  btnToShow.setAttribute('aria-expanded', isVisible);
+                  if(btnToShow) btnToShow.setAttribute('aria-expanded', isVisible);
               } else {
                   if(p) p.classList.remove('visible');
                   if(allBtns[index]) allBtns[index].setAttribute('aria-expanded', 'false');
@@ -792,7 +788,6 @@
         });
       }
       
-      // [NOVO] Event listener para o botão de Contato
       if(contatoBtn && contatoPopup) {
         contatoBtn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -802,7 +797,6 @@
 
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
-        // Verifica se o clique foi fora de TODOS os pop-ups e botões
         const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
         const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
         const isClickInsideContato = contatoPopup && contatoPopup.contains(e.target);
