@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treinamento de Periféricos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .wizard { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .step-indicator { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        .step { padding: 10px 20px; border-radius: 4px; background: #eee; color: #333; }
+        .step.active { background: #007bff; color: white; }
+        .step-content { overflow: hidden; position: relative; }
+        .step-pane { display: none; }
+        .step-pane.active { display: block; }
+        .navigation { text-align: right; margin-top: 20px; }
+        button { padding: 10px 20px; border: none; background: #007bff; color: white; border-radius: 4px; cursor: pointer; }
+        button:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+
+<div class="wizard">
+    <div class="step-indicator">
+        <div class="step active" data-step="1">Passo 1</div>
+        <div class="step" data-step="2">Passo 2</div>
+        <div class="step" data-step="3">Passo 3</div>
+        <div class="step" data-step="4">Passo 4</div>
+        <div class="step" data-step="5">Passo 5</div>
+        <div class="step" data-step="6">Passo 6</div>
+        <div class="step" data-step="7">Passo 7</div>
+    </div>
+    <div class="step-content">
+        <div class="step-panes">
+            <div class="step-pane active">
+                <h2>Passo 1: Introdução aos Periféricos</h2>
+                <p>Este treinamento abordará a instalação e configuração de periféricos essenciais.</p>
+            </div>
+            <div class="step-pane">
+                <h2>Passo 2: Instalação de Impressora</h2>
+                <p>Conecte a impressora ao computador e instale os drivers necessários.</p>
+            </div>
+            <div class="step-pane">
+                <h2>Passo 3: Configuração do Leitor de Código de Barras</h2>
+                <p>Instale o software do leitor e configure-o para o tipo de código de barras utilizado.</p>
+            </div>
+            <div class="step-pane">
+                <h2>Passo 4: Instalação da Gaveta de Dinheiro</h2>
+                <p>Conecte a gaveta à impressora de recibos e configure o pulso de abertura.</p>
+            </div>
+            <div class="step-pane">
+                <h2>Passo 5: Teste dos Periféricos</h2>
+                <p>Realize testes para garantir que todos os periféricos estão funcionando corretamente.</p>
+            </div>
+            <div class="step-pane">
+                <h2>Passo 6: Solução de Problemas Comuns</h2>
+                <p>Aprenda a identificar e resolver os problemas mais comuns com periféricos.</p>
+            </div>
+            <div class="step-pane">
+                <h2>Passo 7: Conclusão</h2>
+                <p>Parabéns! Você concluiu o treinamento de instalação de periféricos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="navigation">
+        <button id="prevBtn" disabled>Anterior</button>
+        <button id="nextBtn">Próximo</button>
+    </div>
+</div>
+
+<script>
+    let currentStep = 0;
+    const steps = document.querySelectorAll('.step-indicator .step');
+    const stepPanes = document.querySelectorAll('.step-pane');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const totalSteps = steps.length;
+
+    function showStep(stepIndex) {
+        stepPanes.forEach((pane, index) => {
+            pane.classList.toggle('active', index === stepIndex);
+        });
+        steps.forEach((step, index) => {
+            step.classList.toggle('active', index === stepIndex);
+        });
+        prevBtn.disabled = stepIndex === 0;
+        nextBtn.disabled = stepIndex === totalSteps - 1;
+        currentStep = stepIndex;
+    }
+
+    nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps - 1) {
+            showStep(currentStep + 1);
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+            showStep(currentStep - 1);
+        }
+    });
+
+    showStep(0);
+</script>
+
+</body>
+</html>
