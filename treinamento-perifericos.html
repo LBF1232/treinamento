@@ -119,29 +119,28 @@
     .stepper-btn:focus{ outline:3px solid rgba(0,90,156,0.12); outline-offset:3px; }
     .stepper-btn.active{ background:var(--novo-2); color:white; border-color:transparent; transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,90,156,0.12); }
 
-    /* Lógica de "Sliding Track" */
+    /* Lógica de Mostrar/Ocultar com .active */
     .wizard-body{ 
       width:100%; 
       min-height:360px; /* Garante que o container tenha altura */
       position:relative; 
-      overflow: hidden; /* Esconde os outros slides */
     }
     .wizard-track{ 
-      display:flex; /* Coloca os slides um ao lado do outro */
       width:100%; 
       height: 100%;
-      transition: transform 0.6s cubic-bezier(.22,.9,.2,1); 
     }
 
     .step-pane{
       width:100%; 
-      flex: 0 0 100%; /* Cada slide ocupa 100% da largura */
       padding:1.25rem 1.5rem 1.75rem 1.5rem; 
       overflow:auto;
       max-height: calc(70vh); 
       min-height: 360px; /* Garante que todos os slides tenham a mesma altura */
-      display: flex; /* Correção para bug de alinhamento */
-      flex-direction: column; /* Correção para bug de alinhamento */
+      display: none; /* Oculto por padrão */
+      flex-direction: column;
+    }
+    .step-pane.active {
+      display: flex; /* Exibido quando ativo */
     }
 
 
@@ -384,7 +383,7 @@
     <main class="wizard-body" id="wizardBody">
       <div class="wizard-track" id="wizardTrack" aria-live="polite" aria-atomic="true">
 
-        <section class="step-pane" role="region" aria-labelledby="step1title">
+        <section class="step-pane active" role="region" aria-labelledby="step1title">
           <div class="step-counter">Etapa 1 de 7</div>
           <h2 id="step1title">Preparação (Ajuste Temporário do Teclado)</h2>
           <div class="warning-block">
@@ -449,10 +448,12 @@
             <li>Configure as portas na seguinte sequência padrão:</li>
           </ol>
           <div class="info-block" aria-live="polite">
-            <strong>Porta COM1:</strong> 06 - Balança (devido ao serial)<br><br>
-            <strong>Porta COM2:</strong> 03 - Leitor Primário (Pistola)<br><br>
-            <strong>Porta COM2:</strong> 04 - Leitor Secundário (Leitor de mesa)<br><br>
-            <strong>Porta COM3 ou COM4:</strong> 05 - Pinpad
+            <ol style="padding-left: 1.2rem; margin: 0;">
+              <li><strong>Porta COM1:</strong> 06 - Balança (devido ao serial)</li>
+              <li><strong>Porta COM2:</strong> 03 - Leitor Primário (Pistola)</li>
+              <li><strong>Porta COM2:</strong> 04 - Leitor Secundário (Leitor de mesa)</li>
+              <li><strong>Porta COM3 ou COM4:</strong> 05 - Pinpad</li>
+            </ol>
           </div>
           <p>Após definir todas as portas, salve as configurações.</p>
         </section>
@@ -575,34 +576,23 @@
 
       const totalSteps = stepPanes.length;
       let currentStep = 0;
-      
-      // Trava de animação
-      let isAnimating = false;
-      // Duração da animação (600ms = 0.6s do seu CSS)
-      const animationDuration = 600; 
 
       // --- Função: mostrar etapa ---
       function showStep(stepIndex, opts = {}) {
-        
-        // Se estiver animando, ignora o clique
-        if (isAnimating && !opts.force) return;
-
         stepIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
         
-        // Se já estiver na etapa, não faz nada
         if (stepIndex === currentStep && !opts.force) {
-            // Se for forçado (primeiro load), libera a trava
-            if(opts.force) isAnimating = false;
             return;
         }
 
-        // Ativa a trava
-        isAnimating = true;
-        currentStep = stepIndex;
+        stepPanes.forEach((pane, index) => {
+          pane.classList.remove('active');
+        });
 
-        // Lógica de "deslizar" (transform)
-        const offset = -currentStep * 100;
-        wizardTrack.style.transform = `translateX(${offset}%)`;
+        const currentPane = stepPanes[stepIndex];
+        currentPane.classList.add('active');
+
+        currentStep = stepIndex;
         
         prevBtn.disabled = currentStep === 0;
         nextBtn.disabled = false;
@@ -622,19 +612,12 @@
         const activeBtn = stepperButtons[currentStep];
         if (activeBtn) activeBtn.scrollIntoView({behavior: 'smooth', inline: 'center'});
         
-        // Animação do fundo
         animateBackground(currentStep);
 
-        const currentPane = stepPanes[currentStep];
         if(currentPane) {
           currentPane.querySelectorAll('button, [tabindex], a, input').forEach(el => el.setAttribute('tabindex','0'));
           currentPane.focus?.();
         }
-        
-        // Libera a trava após a animação de 0.6s terminar
-        setTimeout(() => {
-            isAnimating = false;
-        }, animationDuration);
       }
 
       // --- Next / Prev ---
@@ -741,7 +724,7 @@
       }
 
       // --- Inicializar ---
-      showStep(0, {force: true}); // Adiciona 'force' para a carga inicial
+      showStep(0, {force: true});
 
 
       // --- A11y ---
