@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>POP: Configuração de Periféricos (PDV Acrux)</title>
+  <title>POP: Carga de Balanças (Consinco/MGV 7)</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 
@@ -119,28 +119,29 @@
     .stepper-btn:focus{ outline:3px solid rgba(0,90,156,0.12); outline-offset:3px; }
     .stepper-btn.active{ background:var(--novo-2); color:white; border-color:transparent; transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,90,156,0.12); }
 
-    /* Lógica de Mostrar/Ocultar com .active */
+    /* Lógica de "Sliding Track" */
     .wizard-body{ 
       width:100%; 
       min-height:360px; /* Garante que o container tenha altura */
       position:relative; 
+      overflow: hidden; /* Esconde os outros slides */
     }
     .wizard-track{ 
+      display:flex; 
       width:100%; 
       height: 100%;
+      transition: transform 0.6s cubic-bezier(.22,.9,.2,1); 
     }
 
     .step-pane{
       width:100%; 
+      flex: 0 0 100%; 
       padding:1.25rem 1.5rem 1.75rem 1.5rem; 
       overflow:auto;
       max-height: calc(70vh); 
       min-height: 360px; /* Garante que todos os slides tenham a mesma altura */
-      display: none; /* Oculto por padrão */
+      display: flex;
       flex-direction: column;
-    }
-    .step-pane.active {
-      display: flex; /* Exibido quando ativo */
     }
 
 
@@ -194,7 +195,7 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; 
       font-size:0.95rem;
       margin: 0.75rem 0;
-      word-break: break-all; /* Quebra de linha em comandos longos */
+      word-break: break-all;
     }
     .info-block small {
       display:block; 
@@ -276,13 +277,16 @@
       color: var(--text);
     }
     
-    /* Caixa de Download (substitui a senha) */
     .download-box .info-block {
       margin: 0;
       padding: 0.5rem 1rem;
       text-align: center;
       font-size: 1rem;
       font-family: -apple-system, "Segoe UI", Roboto;
+    }
+    .download-box .info-block strong {
+      font-size: 1.1rem;
+      color: var(--novo-2);
     }
 
     .download-btn-pdf {
@@ -358,10 +362,10 @@
     <header class="wizard-header">
       <div class="wizard-title">
         <a href="index.html" class="back-btn" aria-label="Voltar ao catálogo">&larr;</a>
-        <div class="brand-badge" aria-hidden="true">🔌</div>
+        <div class="brand-badge" aria-hidden="true">📤</div>
         <div>
-          <h1 id="wizardTitle">POP: Configuração de Periféricos (PDV Acrux)</h1>
-          <div class="wizard-meta">PDV Licenciado e com Cargas</div>
+          <h1 id="wizardTitle">POP: Envio de Carga para Balanças</h1>
+          <div class="wizard-meta">Consinco e MGV 7</div>
         </div>
       </div>
 
@@ -370,147 +374,136 @@
       </div>
 
       <nav class="stepper-nav" id="stepperNav" aria-label="Navegação das etapas" role="navigation">
-        <button class="stepper-btn active" data-step-index="0">1. Preparação</button>
-        <button class="stepper-btn" data-step-index="1">2. Identificar Portas</button>
-        <button class="stepper-btn" data-step-index="2">3. Impressora</button>
-        <button class="stepper-btn" data-step-index="3">4. Configurar COMs</button>
-        <button class="stepper-btn" data-step-index="4">5. Reiniciar</button>
-        <button class="stepper-btn" data-step-index="5">6. Testar</button>
-        <button class="stepper-btn" data-step-index="6">7. Reverter Teclado</button>
+        <button class="stepper-btn active" data-step-index="0">1. Acesso (Consinco)</button>
+        <button class="stepper-btn" data-step-index="1">2. Geração (Consinco)</button>
+        <button class="stepper-btn" data-step-index="2">3. Acesso (MGV 7)</button>
+        <button class="stepper-btn" data-step-index="3">4. Importação (MGV 7)</button>
+        <button class="stepper-btn" data-step-index="4">5. Envio (MGV 7)</button>
+        <button class="stepper-btn" data-step-index="5">6. Solução de Problemas</button>
       </nav>
     </header>
 
     <main class="wizard-body" id="wizardBody">
       <div class="wizard-track" id="wizardTrack" aria-live="polite" aria-atomic="true">
 
-        <section class="step-pane active" role="region" aria-labelledby="step1title">
-          <div class="step-counter">Etapa 1 de 7</div>
-          <h2 id="step1title">Preparação (Ajuste Temporário do Teclado)</h2>
-          <div class="warning-block">
-            <strong>Pré-requisitos Obrigatórios:</strong> O PDV deve estar licenciado e ter recebido as cargas de configuração.
-          </div>
-          <p>Se estiver usando um teclado Sweda ou Smark (Padrão B), mude-o temporariamente para o modo USB (Padrão A) para acessar os menus.</p>
+        <section class="step-pane" role="region" aria-labelledby="step1title">
+          <div class="step-counter">Etapa 1 de 6</div>
+          <h2 id="step1title">Fase 1: Acesso ao Consinco</h2>
+          <p>Esta fase é realizada no portal web para criar os arquivos de preço.</p>
+          <h3>1. Acesso ao Portal</h3>
           <ol>
-            <li>Pressione <strong>Ctrl + Alt + Shift + T</strong> simultaneamente.</li>
-            <li>Selecione <strong>Padrão A (Teclado USB)</strong>.</li>
-            <li>Pressione <strong>F10</strong> para salvar.</li>
+            <li>No Google Chrome, acesse: <code>https://novostacarejo.autosky.cloud</code></li>
+            <li>Insira seu <strong>Usuário AD</strong> e <strong>Senha</strong> e clique em Entrar.</li>
+            <li>Feche qualquer pop-up de erro (ex: "Failed to get data").</li>
+          </ol>
+          <h3>2. Acesso ao Consinco</h3>
+          <ol>
+            <li>Na "Lista de Aplicativos", clique no ícone <strong>Consinco/Menu</strong>.</li>
+            <li>Na nova janela, insira seu <strong>Usuário</strong> (ex: EMANOELS) e <strong>Empresa</strong> (ex: 005-BONGI).</li>
+            <li>Digite sua <strong>Senha</strong> e clique em Entrar.</li>
           </ol>
         </section>
 
         <section class="step-pane" role="region" aria-labelledby="step2title">
-          <div class="step-counter">Etapa 2 de 7</div>
-          <h2 id="step2title">Identificar Portas Físicas (Terminal)</h2>
-          <p>Precisamos saber quantas portas COM o PDV está reconhecendo.</p>
-          <ol>
-            <li>Pressione <strong>Alt + F2</strong>.</li>
-            <li>Na caixa de texto, digite <code>term</code> e pressione Enter.</li>
-            <li>No terminal (tela preta), digite o comando:</li>
-          </ol>
+          <div class="step-counter">Etapa 2 de 6</div>
+          <h2 id="step2title">Fase 1: Geração de Arquivos (Consinco)</h2>
+          <h3>3. Configuração da Carga</h3>
+          <p>No menu principal do Consinco, navegue até:</p>
           <div class="info-block">
-            ls -ln /dev/ttyS*
+            Comercial > Preço > Geração de Arquivo para Carga nos PDVs
           </div>
-          <p>Analise o resultado (ex: `ttyS0`, `ttyS1`, `ttyS2`). Anote a quantidade de portas e feche o terminal.</p>
-          <small>Se aparecerem 3 portas mas você tem 4 dispositivos, é provável que os leitores compartilharão a mesma porta.</small>
+          <p>Na janela "Geração de Arquivo...", altere os seguintes campos:</p>
+          <ul>
+            <li><strong>Tipo de Carga:</strong> Mude de "Parcial" para <strong>"Total"</strong>.</li>
+            <li>Verifique se a opção <strong>"Gera carga balança"</strong> está marcada.</li>
+          </ul>
+          <h3>4. Geração e Verificação</h3>
+          <ol>
+            <li>Clique no botão <strong>Gera Carga</strong>.</li>
+            <li>Confirme o pop-up "Resumo Carga(s)".</li>
+            <li>Abra o Explorador de Arquivos e navegue até o diretório da loja (ex: <code>Z:\10.101.103.8\Consinco\Balanca\Bongi</code>).</li>
+            <li>Confirme que os 4 arquivos (.txt) foram atualizados com a data e hora atuais.</li>
+          </ol>
         </section>
 
         <section class="step-pane" role="region" aria-labelledby="step3title">
-          <div class="step-counter">Etapa 3 de 7</div>
-          <h2 id="step3title">Configuração da Impressora</h2>
-          
-          <h3>Cenário A: Impressora EPSON (Ex: TM-T20X II)</h3>
+          <div class="step-counter">Etapa 3 de 6</div>
+          <h2 id="step3title">Fase 2: Acesso ao MGV 7</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone" data-zoom-content="🖥️">🖥️</div>
+          <p>Esta fase é realizada no software local (MGV 7) para enviar os arquivos gerados para as balanças.</p>
           <ol>
-            <li>Pressione <strong>; (ponto e vírgula)</strong> para abrir o menu de periféricos.</li>
-            <li>Vá em <strong>Impressora</strong>.</li>
-            <li>Defina <strong>Categoria</strong> como <strong>NFCe</strong>.</li>
-            <li>Defina <strong>Porta</strong> como <strong>LPT1</strong>.</li>
-            <li>Salve e volte.</li>
-            <li>Vá em <strong>Modelo de impressora não fiscal</strong>.</li>
-            <li>Selecione o modelo exato (ex: Epson TM-T20X II).</li>
-            <li>Salve e saia. Prossiga para a Etapa 4.</li>
-          </ol>
-
-          <h3>Cenário B: Impressora Elgin ou Sweda (Porta Virtual)</h3>
-          <ol>
-            <li>Ligue a impressora mantendo o botão <strong>"Avança" (Feed)</strong> pressionado.</li>
-            <li>Pressione "Avança" <strong>4 vezes</strong> (Opção 4 - USB PORT MOD SETTING).</li>
-            <li>Pressione "Avança" <strong>2 vezes</strong> (Opção 2 - Virtual COM Mode).</li>
-            <li>A impressora confirmará o modo "Virtual COM".</li>
-            <li><strong>REINICIE A APLICAÇÃO DO PDV</strong> (<code>killall AcruxPDV</code> e <code>acruxpdv</code>).</li>
+            <li>Na Área de Trabalho do computador, execute o <strong>"MGVCentral.exe"</strong>.</li>
+            <li>Na tela "MGV 7 - Login", insira o <strong>Usuário</strong> (ex: LOJA05) e a <strong>Senha</strong>.</li>
+            <li>Clique em OK.</li>
           </ol>
         </section>
 
         <section class="step-pane" role="region" aria-labelledby="step4title">
-          <div class="step-counter">Etapa 4 de 7</div>
-          <h2 id="step4title">Configurar Sequência de Periféricos (Portas COM)</h2>
-          <p>Com a impressora configurada e a aplicação reiniciada (se necessário), vamos definir os outros periféricos.</p>
+          <div class="step-counter">Etapa 4 de 6</div>
+          <h2 id="step4title">Fase 2: Importação dos Arquivos (MGV 7)</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone" data-zoom-content="📥">📥</div>
           <ol>
-            <li>Pressione <strong>; (ponto e vírgula)</strong> para abrir o menu.</li>
-            <li>Configure as portas na seguinte sequência padrão:</li>
+            <li>No software "MGV 7", clique na aba/botão <strong>Importação</strong>.</li>
+            <li>Na janela "Importar Arquivos", clique no botão <strong>Importar</strong>.</li>
+            <li>Aguarde o sistema processar os arquivos (barras de progresso).</li>
           </ol>
-          <div class="info-block" aria-live="polite">
-            <ol style="padding-left: 1.2rem; margin: 0;">
-              <li><strong>Porta COM1:</strong> 06 - Balança (devido ao serial)</li>
-              <li><strong>Porta COM2:</strong> 03 - Leitor Primário (Pistola)</li>
-              <li><strong>Porta COM2:</strong> 04 - Leitor Secundário (Leitor de mesa)</li>
-              <li><strong>Porta COM3 ou COM4:</strong> 05 - Pinpad</li>
-            </ol>
+          <div class="warning-block">
+            Se um pop-up "Ocorreram erros durante a importação" aparecer, clique em "Sim" para visualizar o log. Revise os erros (ex: "código do item não é numérico"), feche o log e continue.
           </div>
-          <p>Após definir todas as portas, salve as configurações.</p>
         </section>
 
         <section class="step-pane" role="region" aria-labelledby="step5title">
-          <div class="step-counter">Etapa 5 de 7</div>
-          <h2 id="step5title">Reiniciar a Aplicação (Final)</h2>
-          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de reboot" data-zoom-content="🔄">🔄</div>
-          <p>Após salvar a configuração das portas COM, a aplicação deve ser reiniciada novamente.</p>
+          <div class="step-counter">Etapa 5 de 6</div>
+          <h2 id="step5title">Fase 2: Envio da Carga (MGV 7)</h2>
           <ol>
-            <li>Pressione <strong>Alt + F2</strong>.</li>
-            <li>Digite <code>killall AcruxPDV</code> e pressione Enter.</li>
-            <li>Pressione <strong>Alt + F2</strong> novamente.</li>
-            <li>Digite <code>acruxpdv</code> e pressione Enter.</li>
+            <li>Clique na aba/botão <strong>Carga</strong>.</li>
+            <li>Escolha sua opção:</li>
           </ol>
+          <h3>Opção 1: Balança Específica</h3>
+          <ul>
+            <li>Selecione "Lista de balanças" e clique em "Selecionar Balanças".</li>
+            <li>Desmarque "Marcar todos" e selecione as balanças desejadas.</li>
+            <li>Clique em <strong>Enviar</strong>.</li>
+          </ul>
+          <h3>Opção 2: Todas as Balanças</h3>
+          <ul>
+            <li>Selecione a opção "Todas as balanças".</li>
+            <li>Clique em <strong>Enviar</strong>.</li>
+          </ul>
+          <h3>Monitoramento</h3>
+          <p>Após clicar em "Enviar", clique imediatamente em <strong>Acompanhar</strong>. Acompanhe o progresso até que as balanças mostrem "100%".</p>
         </section>
 
         <section class="step-pane" role="region" aria-labelledby="step6title">
-          <div class="step-counter">Etapa 6 de 7</div>
-          <h2 id="step6title">Testar Todos os Periféricos</h2>
+          <div class="step-counter">Etapa 6 de 6</div>
+          <h2 id="step6title">Solução de Problemas</h2>
           
-          <h3>1. Verificar Pinpad (Pós-Restart)</h3>
-          <p>Pressione <strong>;</strong> e verifique se na COM do Pinpad (COM3/4) aparece o nome da loja. Se sim, OK.</p>
-          
-          <h3>2. Testar Leitores (Mesa e Pistola)</h3>
-          <p>Na tela inicial, pressione <strong>H</strong> (Consultar Cupom/Produto) e bipe um código com ambos os leitores.</p>
-          
-          <h3>3. Testar Impressora</h3>
-          <p>Na tela inicial, pressione <strong>X</strong> (Leitura X) e verifique a impressão.</p>
+          <div class="warning-block">
+            <h3>🚨 Falha na Fase 1 (Consinco)</h3>
+            <p>Se os preços não atualizarem, os arquivos .txt podem estar corrompidos.</p>
+            <ol>
+              <li>Navegue até a pasta da balança (ex: <code>Z:\...\Consinco\Balanca\Bongi</code>).</li>
+              <li><strong>DELETE</strong> os 4 arquivos: <code>infnutri.txt</code>, <code>itensmgv.txt</code>, <code>precopro.txt</code>, <code>trinfo.txt</code>.</li>
+              <li>Volte ao Consinco e clique em <strong>Gera Carga</strong> novamente.</li>
+              <li>Se persistir, contate o Departamento Comercial.</li>
+            </ol>
+          </div>
 
-          <h3>4. Testar Comunicação do Pinpad</h3>
-          <ol>
-            <li>Pressione <strong>A</strong> (Abrir Caixa).</li>
-            <li>Pressione <strong>/ (barra)</strong> para listar configurações.</li>
-            <li>Selecione <strong>109 - TRANSAÇÃO GERENCIAL TEF</strong>.</li>
-            <li>Selecione <strong>08 - Carga Forçada de Tabelas</strong>.</li>
-          </ol>
-          <p>O visor do Pinpad deve exibir "Atualizando" ou "Recebendo Tabelas".</p>
-        </section>
-
-        <section class="step-pane" role="region" aria-labelledby="step7title">
-          <div class="step-counter">Etapa 7 de 7</div>
-          <h2 id="step7title">Reverter Layout do Teclado (Opcional)</h2>
-          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de teclado" data-zoom-content="⌨️">⌨️</div>
-          <p>Se você iniciou com um teclado Sweda ou Smark e o mudou para "Padrão A" na Etapa 1, agora é a hora de revertê-lo:</p>
-          <ol>
-            <li>Pressione <strong>Ctrl + Alt + Shift + T</strong>.</li>
-            <li>Selecione <strong>Padrão B (Teclados Smark e Sweda)</strong>.</li>
-            <li>Pressione <strong>F10</strong> para salvar.</li>
-          </ol>
+          <div class="warning-block" style="margin-top: 1rem;">
+            <h3>🚨 Falha na Fase 2 (MGV 7)</h3>
+            <p>Se a tela "Acompanhar" mostrar <strong>"Falha na comunicação"</strong> ou <strong>"Erro"</strong>:</p>
+            <ul>
+              <li>A balança específica não recebeu a carga.</li>
+              <li>Ela deve ser verificada pessoalmente (conexão de rede, se está ligada, ou se precisa de reconfiguração de IP/Rede).</li>
+            </ul>
+          </div>
         </section>
 
       </div>
     </main>
 
     <footer class="wizard-footer" role="contentinfo">
-      <div class="step-indicator" id="stepIndicator" aria-live="polite">Etapa 1 / 7</div>
+      <div class="step-indicator" id="stepIndicator" aria-live="polite">Etapa 1 / 6</div>
       <div class="wizard-navigation" aria-hidden="false">
         <button id="prevBtn" class="btn" aria-label="Etapa anterior">Anterior</button>
         <button id="nextBtn" class="btn" aria-label="Próxima etapa">Seguir</button>
@@ -526,7 +519,7 @@
         <small>Clique no botão abaixo para baixar a versão em PDF deste procedimento.</small>
       </div>
       
-      <a href="pdf/pop_perifericos_pdv.pdf" class="download-btn-pdf" aria-label="Baixar POP em PDF" download>
+      <a href="pdf/pop_carga_consinco_mgv.pdf" class="download-btn-pdf" aria-label="Baixar POP em PDF" download>
         &#x21E9; Baixar PDF
       </a>
       
@@ -536,7 +529,7 @@
       <h3>Vídeo de Referência</h3>
       <div class="video-container">
         <iframe 
-          src="https://www.youtube.com/embed/cqbAnZKqLm4" 
+          src="https://www.youtube.com/embed/uCUX_KZJdk8" 
           title="YouTube video player" 
           frameborder="0" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -555,6 +548,8 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+      // --- [REMOVIDO] Script da Senha do Dia ---
 
       // --- Script do Wizard ---
       const wizardTrack = document.getElementById('wizardTrack');
@@ -576,23 +571,34 @@
 
       const totalSteps = stepPanes.length;
       let currentStep = 0;
+      
+      // Trava de animação
+      let isAnimating = false;
+      // Duração da animação (600ms = 0.6s do seu CSS)
+      const animationDuration = 600; 
 
       // --- Função: mostrar etapa ---
       function showStep(stepIndex, opts = {}) {
+        
+        // Se estiver animando, ignora o clique
+        if (isAnimating && !opts.force) return;
+
         stepIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
         
+        // Se já estiver na etapa, não faz nada
         if (stepIndex === currentStep && !opts.force) {
+            // Se for forçado (primeiro load), libera a trava
+            if(opts.force) isAnimating = false;
             return;
         }
 
-        stepPanes.forEach((pane, index) => {
-          pane.classList.remove('active');
-        });
-
-        const currentPane = stepPanes[stepIndex];
-        currentPane.classList.add('active');
-
+        // Ativa a trava
+        isAnimating = true;
         currentStep = stepIndex;
+
+        // Lógica de "deslizar" (transform)
+        const offset = -currentStep * 100;
+        wizardTrack.style.transform = `translateX(${offset}%)`;
         
         prevBtn.disabled = currentStep === 0;
         nextBtn.disabled = false;
@@ -612,12 +618,19 @@
         const activeBtn = stepperButtons[currentStep];
         if (activeBtn) activeBtn.scrollIntoView({behavior: 'smooth', inline: 'center'});
         
+        // Animação do fundo
         animateBackground(currentStep);
 
+        const currentPane = stepPanes[currentStep];
         if(currentPane) {
           currentPane.querySelectorAll('button, [tabindex], a, input').forEach(el => el.setAttribute('tabindex','0'));
           currentPane.focus?.();
         }
+        
+        // Libera a trava após a animação de 0.6s terminar
+        setTimeout(() => {
+            isAnimating = false;
+        }, animationDuration);
       }
 
       // --- Next / Prev ---
@@ -724,7 +737,7 @@
       }
 
       // --- Inicializar ---
-      showStep(0, {force: true});
+      showStep(0, {force: true}); // Adiciona 'force' para a carga inicial
 
 
       // --- A11y ---
