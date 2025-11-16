@@ -190,13 +190,12 @@
     }
     .go-btn:active { transform: scale(0.95); }
 
-    /* --- [CORREÇÃO] POP-UP DE COMANDOS --- */
+    /* --- POP-UP DE COMANDOS --- */
     #comandosPopup {
       width: 420px; 
       bottom: auto; 
       top: 1.5rem; 
       
-      /* Correção para evitar quebra de layout: */
       max-height: calc(90vh - 4rem); /* Altura máxima igual a do app */
       overflow-y: auto; /* Adiciona scroll interno se o conteúdo for maior */
       overflow-x: hidden;
@@ -221,7 +220,7 @@
       gap: 1rem;
       padding: 0.6rem 0.5rem;
       border-radius: 8px;
-      flex-wrap: wrap; /* Para o acordeão */
+      flex-wrap: wrap; 
     }
     .cmd-item:not(.expandable):hover {
        background: rgba(0,0,0,0.04);
@@ -246,7 +245,7 @@
       background: rgba(0,0,0,0.03);
       border: 1px solid rgba(0,0,0,0.05);
       margin-bottom: 0.5rem;
-      padding: 0; /* Padding será no header/body */
+      padding: 0; 
     }
     
     .cmd-item-header {
@@ -255,7 +254,7 @@
       align-items: center;
       width: 100%;
       cursor: pointer;
-      padding: 0.6rem 0.8rem; /* Padding do header */
+      padding: 0.6rem 0.8rem; 
     }
     .cmd-item-header span:first-child {
       font-weight: 600;
@@ -295,9 +294,9 @@
     }
 
     .cmd-item.expanded .cmd-item-body {
-      max-height: 500px; /* Altura suficiente */
+      max-height: 500px; 
       padding: 0.5rem 0.8rem 1rem 0.8rem;
-      margin-top: -5px; /* Puxa para perto do header */
+      margin-top: -5px; 
       border-top: 1px solid rgba(0,0,0,0.08);
     }
     .cmd-item.expanded .arrow {
@@ -483,11 +482,11 @@
             <span class="card-title">Formatação de PDV</span>
           </a>
 
-          <a href="#" class="training-card" aria-label="Iniciar treinamento: Gestão de Estoque (WMS)">
-            <div class="card-icon fallback">
-              Gestão de Estoque (WMS)
+          <a href="treinamento-perifericos.html" class="training-card" aria-label="Iniciar treinamento: Configuração de Periféricos">
+            <div class="card-icon">
+              <img src="img/perifericos.png" alt="Ilustração de periféricos">
             </div>
-            <span class="card-title">Gestão de Estoque (WMS)</span>
+            <span class="card-title">Configuração de Periféricos</span>
           </a>
 
           <a href="treinamento-balanca.html" class="training-card" aria-label="Iniciar treinamento: Configuração de Balança">
@@ -669,7 +668,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-      // --- [MODIFICADO] Script dos Pop-ups ---
+      // --- Script dos Pop-ups ---
       const linksBtn = document.getElementById('linksBtn');
       const linksPopup = document.getElementById('linksPopup');
       
@@ -689,7 +688,6 @@
                   btnToShow.setAttribute('aria-expanded', isVisible);
               } else {
                   p.classList.remove('visible');
-                  // Garante que o outro botão também seja atualizado
                   if(allBtns[index]) allBtns[index].setAttribute('aria-expanded', 'false');
               }
           });
@@ -715,7 +713,6 @@
 
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
-        // Verifica se o clique foi fora de AMBOS os pop-ups
         const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
         const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
         const isLinksBtn = e.target === linksBtn;
@@ -762,7 +759,7 @@
         });
       });
       
-      // --- [NOVO] Script do Acordeão de Comandos ---
+      // --- Script do Acordeão de Comandos ---
       document.querySelectorAll('.cmd-item.expandable').forEach(item => {
         const header = item.querySelector('.cmd-item-header');
         if(header) {
