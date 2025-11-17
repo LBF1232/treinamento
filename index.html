@@ -132,11 +132,10 @@
     }
 
 
-    /* --- [CORREÇÃO] POP-UP DE LINKS --- */
+    /* --- POP-UP DE LINKS --- */
     .links-popup {
       display: none; 
       position: absolute;
-      /* Movido para o topo */
       top: 1.5rem;   
       bottom: auto;
       left: calc(240px + 1.5rem + 1rem); 
@@ -212,6 +211,10 @@
     /* --- POP-UP DE COMANDOS --- */
     #comandosPopup, #contatoPopup, #viradaPopup {
       width: 420px; 
+      bottom: auto; 
+      top: 1.5rem; 
+      left: calc(240px + 1.5rem + 1rem); /* Posição padrão */
+      
       max-height: calc(90vh - 4rem); 
       overflow-y: auto; 
       overflow-x: hidden;
@@ -455,7 +458,7 @@
       justify-content: center;
     }
     
-    /* Responsivo */
+    /* --- [CORREÇÃO] Responsivo --- */
     @media (max-width: 800px) {
       body { padding: 0; }
       .layout-container {
@@ -467,16 +470,21 @@
       .sidebar {
         flex: 0 0 auto;
         border-radius: 0;
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem; 
+        /* Altera para coluna para empilhar header e nav */
+        flex-direction: column; 
+        align-items: stretch; /* Faz os filhos ocuparem a largura total */
+        gap: 0.5rem; /* Espaço entre header e nav */
         padding: 0.75rem 1rem;
       }
-      .sidebar-header { flex-direction: row; gap: 0.75rem; }
+      .sidebar-header { 
+        flex-direction: row; 
+        gap: 0.75rem; 
+        /* Impede que o header vá para o centro */
+        justify-content: flex-start; 
+      }
       
       .sidebar-nav {
         flex-direction: row;
-        flex: 1; /* Ocupa o espaço disponível */
         min-width: 0; /* Corrige bug de overflow do flexbox */
         overflow-x: auto; /* Permite rolar os botões */
         padding-bottom: 5px; /* Espaço para a barra de rolagem */
@@ -502,14 +510,14 @@
       .links-popup {
         left: 1rem;
         bottom: auto;
-        top: 60px; /* Abaixo do header */
+        top: 110px; /* [AJUSTADO] Desce o pop-up para baixo da nova sidebar */
         width: calc(100% - 2rem);
       }
        #comandosPopup, #contatoPopup, #viradaPopup {
-        top: 60px;
+        top: 110px; /* [AJUSTADO] Desce o pop-up para baixo da nova sidebar */
         left: 1rem;
         width: calc(100% - 2rem);
-        max-height: calc(100vh - 70px); 
+        max-height: calc(100vh - 120px); 
       }
     }
 
