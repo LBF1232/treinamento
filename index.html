@@ -134,7 +134,7 @@
     }
 
 
-    /* --- POP-UP DE LINKS --- */
+    /* --- [CORREÇÃO] POP-UP DE LINKS (Z-INDEX) --- */
     .links-popup {
       display: none; 
       position: absolute;
@@ -147,7 +147,8 @@
       border-radius: 12px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.2);
       backdrop-filter: blur(var(--glass-blur));
-      z-index: 1000;
+      /* Z-index deve ser maior que o da sidebar (1001) */
+      z-index: 1002; 
       padding: 0.75rem;
       opacity: 0;
     }
@@ -431,8 +432,7 @@
     .card-icon img {
       width: 100%;
       height: 100%;
-      /* [CORREÇÃO] Imagem contida, não cortada */
-      object-fit: contain; 
+      object-fit: contain; /* Imagem contida, não cortada */
     }
 
     /* --- ESTILO FALLBACK --- */
@@ -461,7 +461,8 @@
       justify-content: center;
     }
     
-    /* --- [NOVO] Estilos do Menu Mobile --- */
+    /* --- Estilos do Menu Mobile --- */
+    /* [NOVO] Cabeçalho fixo no mobile */
     .mobile-header {
       display: none; /* Escondido no desktop */
       position: fixed;
@@ -492,11 +493,12 @@
       gap: 0.5rem;
     }
     .mobile-header-logo .sidebar-logo { /* Reutiliza o estilo */
-      max-width: 36px;
-      padding: 3px;
+      /* [CORREÇÃO] Logo maior */
+      max-width: 44px;
+      padding: 4px;
     }
     .mobile-header-logo .sidebar-title { /* Reutiliza o estilo */
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: var(--text); /* Texto escuro no header claro */
     }
 
@@ -529,6 +531,25 @@
       font-weight: 700;
       line-height: 1;
       cursor: pointer;
+    }
+    
+    /* [NOVO] Botão de Fechar para Pop-ups (só no mobile) */
+    .popup-close-btn {
+      display: none; 
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.1);
+      border: none;
+      border-radius: 50%;
+      color: var(--muted);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 1003;
     }
     /* --- FIM Estilos Menu Mobile --- */
     
@@ -608,6 +629,14 @@
         left: 1rem;
         width: calc(100% - 2rem);
         max-height: calc(100vh - 80px); 
+      }
+      
+      /* [NOVO] Mostra o 'X' no mobile e ajusta o título */
+      .popup-close-btn {
+        display: block;
+      }
+      .links-popup h3 {
+        padding-right: 30px; 
       }
     }
 
@@ -734,6 +763,7 @@
     </main>
 
     <div class="links-popup" id="linksPopup" role="dialog" aria-labelledby="linksTitle">
+      <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="linksTitle">Links Rápidos</h3>
       
       <div class="link-item">
@@ -779,6 +809,7 @@
     </div>
     
     <div class="links-popup" id="comandosPopup" role="dialog" aria-labelledby="comandosTitle">
+      <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="comandosTitle">Comandos PDV (Acrux)</h3>
       
       <h4>Comandos de Operação</h4>
@@ -874,6 +905,7 @@
     </div>
     
     <div class="links-popup" id="contatoPopup" role="dialog" aria-labelledby="contatoTitle">
+      <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="contatoTitle">Contatos Regionais</h3>
       
       <div class="contato-item">
@@ -890,6 +922,7 @@
     </div>
     
     <div class="links-popup" id="viradaPopup" role="dialog" aria-labelledby="viradaTitle">
+      <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="viradaTitle">Orientação Virada de Loja</h3>
       
       <h4>Configuração de IP</h4>
@@ -954,7 +987,7 @@
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
           
-          // [CORREÇÃO] Remove a linha que fecha o menu
+          // [MODIFICADO] Não fecha mais o menu principal ao clicar
           // closeMenu(); 
       
           const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
@@ -1028,6 +1061,25 @@
           if(contatoBtn) contatoBtn.setAttribute('aria-expanded', 'false');
           if(viradaBtn) viradaBtn.setAttribute('aria-expanded', 'false'); 
         }
+      });
+
+      // --- [NOVO] Script de Fechar Pop-ups Internos ---
+      document.querySelectorAll('.popup-close-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Encontra o pop-up pai e o esconde
+          const popup = e.target.closest('.links-popup');
+          if (popup) {
+            popup.classList.remove('visible');
+            
+            // Também atualiza o aria-expanded do botão da sidebar
+            const btnId = popup.id.replace('Popup', 'Btn'); // ex: linksPopup -> linksBtn
+            const sidebarBtn = document.getElementById(btnId);
+            if (sidebarBtn) {
+              sidebarBtn.setAttribute('aria-expanded', 'false');
+            }
+          }
+        });
       });
 
       // --- Script de Copiar Link ---
