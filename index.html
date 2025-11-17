@@ -56,7 +56,7 @@
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.5rem; 
       background: rgba(0,0,0,0.12);
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: var(--radius);
@@ -104,7 +104,7 @@
       align-items: center;
       gap: 0.75rem;
       transition: background 0.2s ease, color 0.2s ease;
-      text-decoration: none; /* Para o <a> de Download */
+      text-decoration: none; 
     }
     .nav-btn:hover {
       background: rgba(255,255,255,0.1);
@@ -116,18 +116,29 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .nav-btn.download-link {
-      font-size: 0.9rem; /* Texto um pouco menor para caber */
+      font-size: 0.9rem; 
       line-height: 1.3;
       padding-top: 0.5rem;
       padding-bottom: 0.5rem;
+      margin-top: auto; 
+    }
+
+    .sidebar-footer {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
 
-    /* --- POP-UP DE LINKS --- */
+    /* --- [CORREÇÃO] POP-UP DE LINKS --- */
     .links-popup {
       display: none; 
       position: absolute;
-      bottom: 1.5rem; 
+      /* Movido para o topo */
+      top: 1.5rem;   
+      bottom: auto;
       left: calc(240px + 1.5rem + 1rem); 
       width: 360px; 
       background: var(--card-bg);
@@ -199,17 +210,14 @@
     .go-btn:active { transform: scale(0.95); }
 
     /* --- POP-UP DE COMANDOS --- */
-    #comandosPopup {
+    #comandosPopup, #contatoPopup, #viradaPopup {
       width: 420px; 
-      bottom: auto; 
-      top: 1.5rem; 
-      
       max-height: calc(90vh - 4rem); 
       overflow-y: auto; 
       overflow-x: hidden;
     }
 
-    #comandosPopup h4 {
+    #comandosPopup h4, #contatoPopup h4, #viradaPopup h4 {
       margin: 1.25rem 0.5rem 0.5rem 0.5rem;
       font-size: 0.9rem;
       font-weight: 700;
@@ -218,7 +226,7 @@
       border-bottom: 1px solid rgba(0,0,0,0.1);
       padding-bottom: 5px;
     }
-    #comandosPopup h4:first-of-type {
+    #comandosPopup h4:first-of-type, #contatoPopup h4:first-of-type, #viradaPopup h4:first-of-type {
       margin-top: 0.25rem;
     }
 
@@ -242,7 +250,7 @@
       padding: 3px 8px;
       border-radius: 6px;
       border: 1px solid rgba(0,0,0,0.1);
-      word-break: break-all; /* Quebra comandos longos */
+      word-break: break-all;
     }
     .cmd-item span {
       font-weight: 600;
@@ -313,13 +321,6 @@
     }
     
     /* --- POP-UP DE CONTATOS --- */
-    #contatoPopup {
-      width: 400px; 
-      bottom: auto; 
-      top: 1.5rem; 
-      left: calc(240px + 1.5rem + 1rem + 420px + 1rem); 
-    }
-    
     .contato-item {
       padding: 0.8rem;
       border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -337,6 +338,27 @@
       margin: 0;
       font-weight: 600;
       color: var(--text);
+    }
+
+    /* --- Estilos do Pop-up Virada --- */
+    #viradaPopup .info-block {
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    #viradaPopup .info-block p {
+      margin: 0.5rem 0;
+      color: var(--text);
+      font-weight: 600;
+    }
+    #viradaPopup ul {
+      padding-left: 1.5rem; 
+      margin-top: 0.5rem; 
+      font-weight: 600; 
+      color: var(--text);
+    }
+    #viradaPopup ul li {
+       margin-bottom: 0.5rem;
     }
 
 
@@ -447,16 +469,29 @@
         border-radius: 0;
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
+        gap: 1rem; 
         padding: 0.75rem 1rem;
       }
       .sidebar-header { flex-direction: row; gap: 0.75rem; }
-      .sidebar-logo { max-width: 40px; }
-      .sidebar-title { font-size: 1.1rem; }
-      .sidebar-nav { flex-direction: row; }
-      .nav-btn { font-size: 0.9rem; padding: 0.5rem 0.8rem; }
+      
+      .sidebar-nav {
+        flex-direction: row;
+        flex: 1; /* Ocupa o espaço disponível */
+        min-width: 0; /* Corrige bug de overflow do flexbox */
+        overflow-x: auto; /* Permite rolar os botões */
+        padding-bottom: 5px; /* Espaço para a barra de rolagem */
+      }
+      .nav-btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.8rem;
+        flex-shrink: 0; /* Impede que os botões encolham */
+        white-space: nowrap; /* Impede que o texto quebre */
+      }
       .nav-btn.download-link {
         display: none; 
+      }
+      .sidebar-footer {
+        display: none;
       }
       
       .catalog-wrap {
@@ -470,7 +505,7 @@
         top: 60px; /* Abaixo do header */
         width: calc(100% - 2rem);
       }
-       #comandosPopup, #contatoPopup {
+       #comandosPopup, #contatoPopup, #viradaPopup {
         top: 60px;
         left: 1rem;
         width: calc(100% - 2rem);
@@ -506,12 +541,20 @@
           <span>📞</span>
           <span>Contato Regional</span>
         </button>
+        <button class="nav-btn" id="viradaBtn" aria-haspopup="true">
+          <span>🔄</span>
+          <span>Virada de Loja</span>
+        </button>
       </nav>
        <a href="https://drive.google.com/drive/folders/1pOh4G00xKVwG0NV5VXTM4krAPy9Y_XUJ" target="_blank" class="nav-btn download-link">
           <span>📱</span>
           <span>Download App Novo Mateus</span>
        </a>
-      <div style="flex:1;"></div> </aside>
+      
+      <div class="sidebar-footer">
+        Desenvolvido por Leonardo Freire
+      </div>
+    </aside>
 
     <main class="main-content">
       <div class="catalog-wrap">
@@ -569,6 +612,13 @@
             <span class="card-title">Configurar IP impressora Cartaz</span>
           </a>
           
+          <a href="treinamento-dominio.html" class="training-card" aria-label="Iniciar treinamento: Ingresso de Dominio">
+            <div class="card-icon">
+              <img src="img/dominio.png" alt="Ilustração de ingresso de domínio">
+            </div>
+            <span class="card-title">Ingresso de Dominio</span>
+          </a>
+          
           </div>
       </div>
     </main>
@@ -615,22 +665,7 @@
           <button class="go-btn" data-link="https://webmail.novoatacarejo.com/">Acessar</button>
         </div>
       </div>
-
-      <div class="link-item">
-        <span>Intranet</span>
-        <div class="link-actions">
-          <button class="copy-btn" data-link="https://intranet.novomateus.com.br">Copiar</button>
-          <button class="go-btn" data-link="https://intranet.novomateus.com.br">Acessar</button>
-        </div>
-      </div>
       
-      <div class="link-item">
-        <span>Portal RH</span>
-        <div class="link-actions">
-          <button class="copy-btn" data-link="httpsD://rh.novomateus.com.br">Copiar</button>
-          <button class="go-btn" data-link="https://rh.novomateus.com.br">Acessar</button>
-        </div>
-      </div>
     </div>
     
     <div class="links-popup" id="comandosPopup" role="dialog" aria-labelledby="comandosTitle">
@@ -744,6 +779,29 @@
       
     </div>
     
+    <div class="links-popup" id="viradaPopup" role="dialog" aria-labelledby="viradaTitle">
+      <h3 id="viradaTitle">Orientação Virada de Loja</h3>
+      
+      <h4>Configuração de IP</h4>
+      <div class="info-block">
+        <p>• Os PCs são todos DHCP, exceto: <strong>PC da etiquetadora, MGV e Frente de Loja.</strong></p>
+        <p>• Os ramais tbm ficam com DHCP.</p>
+        <p>• Consulta Preço: <strong>192.168.--.50</strong> (em diante)</p>
+        <p>• Impressoras Epson: <strong>192.168.--.30</strong> ao <strong>38</strong></p>
+        <p>• IP da etiquetadora: <strong>192.169.--.17</strong> (e <strong>.18</strong> se houver 2 PCs)</p>
+      </div>
+
+      <h4>Principal para a Virada</h4>
+      <ul style="padding-left: 1.5rem; margin-top: 0.5rem; font-weight: 600; color: var(--text);">
+        <li>Formatação de PDV</li>
+        <li>Configuração de balança</li>
+        <li>Configuração dos consulta preço</li>
+        <li>Configuração dos coletores</li>
+        <li>Trocar o dominio dos computadores</li>
+        <li>Setar novos IPs nas impressoras e adicionar nos desktops</li>
+      </ul>
+    </div>
+    
   </div>
 
   <script>
@@ -759,10 +817,13 @@
       const contatoBtn = document.getElementById('contatoBtn');
       const contatoPopup = document.getElementById('contatoPopup');
 
+      const viradaBtn = document.getElementById('viradaBtn');
+      const viradaPopup = document.getElementById('viradaPopup');
+
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
-          const allPopups = [linksPopup, comandosPopup, contatoPopup];
-          const allBtns = [linksBtn, comandosBtn, contatoBtn];
+          const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
+          const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
           
           let isVisible;
 
@@ -802,24 +863,35 @@
         });
       }
 
+      if(viradaBtn && viradaPopup) {
+        viradaBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePopup(viradaPopup, viradaBtn);
+        });
+      }
+
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
         const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
         const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
         const isClickInsideContato = contatoPopup && contatoPopup.contains(e.target);
+        const isClickInsideVirada = viradaPopup && viradaPopup.contains(e.target); 
         
         const isLinksBtn = e.target === linksBtn;
         const isComandosBtn = e.target === comandosBtn;
         const isContatoBtn = e.target === contatoBtn;
+        const isViradaBtn = e.target === viradaBtn; 
 
-        if (!isClickInsideLinks && !isClickInsideComandos && !isClickInsideContato && !isLinksBtn && !isComandosBtn && !isContatoBtn) {
+        if (!isClickInsideLinks && !isClickInsideComandos && !isClickInsideContato && !isClickInsideVirada && !isLinksBtn && !isComandosBtn && !isContatoBtn && !isViradaBtn) {
           if(linksPopup) linksPopup.classList.remove('visible');
           if(comandosPopup) comandosPopup.classList.remove('visible');
           if(contatoPopup) contatoPopup.classList.remove('visible');
+          if(viradaPopup) viradaPopup.classList.remove('visible'); 
           
           if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
           if(comandosBtn) comandosBtn.setAttribute('aria-expanded', 'false');
           if(contatoBtn) contatoBtn.setAttribute('aria-expanded', 'false');
+          if(viradaBtn) viradaBtn.setAttribute('aria-expanded', 'false'); 
         }
       });
 
