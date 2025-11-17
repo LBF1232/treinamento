@@ -63,6 +63,7 @@
       backdrop-filter: blur(var(--glass-blur));
       color: white;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease-out; /* [NOVO] Animação de entrada/saída */
     }
     .sidebar-header {
       display: flex;
@@ -70,6 +71,7 @@
       align-items: center;
       gap: 0.5rem;
       text-align: center;
+      position: relative; /* Para o botão de fechar */
     }
     .sidebar-logo {
       max-width: 90px;
@@ -429,7 +431,8 @@
     .card-icon img {
       width: 100%;
       height: 100%;
-      object-fit: cover; 
+      /* [CORREÇÃO] Imagem contida, não cortada */
+      object-fit: contain; 
     }
 
     /* --- ESTILO FALLBACK --- */
@@ -458,7 +461,59 @@
       justify-content: center;
     }
     
-    /* --- [CORREÇÃO] Responsivo --- */
+    /* --- [NOVO] Estilos do Menu Mobile --- */
+    .menu-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
+    }
+    .menu-overlay.is-open {
+      display: block;
+      opacity: 1;
+    }
+    
+    .mobile-menu-toggle {
+      display: none; /* Escondido no desktop */
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      width: 44px;
+      height: 44px;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 10px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar-close-btn {
+      display: none; /* Escondido no desktop */
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+    }
+    /* --- FIM Estilos Menu Mobile --- */
+    
+
+    /* Responsivo */
     @media (max-width: 800px) {
       body { padding: 0; }
       .layout-container {
@@ -466,58 +521,76 @@
         min-height: 100vh;
         width: 100%;
         gap: 0;
-      }
-      .sidebar {
-        flex: 0 0 auto;
-        border-radius: 0;
-        /* Altera para coluna para empilhar header e nav */
-        flex-direction: column; 
-        align-items: stretch; /* Faz os filhos ocuparem a largura total */
-        gap: 0.5rem; /* Espaço entre header e nav */
-        padding: 0.75rem 1rem;
-      }
-      .sidebar-header { 
-        flex-direction: row; 
-        gap: 0.75rem; 
-        /* Impede que o header vá para o centro */
-        justify-content: flex-start; 
+        padding-top: 60px; /* [NOVO] Espaço para o botão de menu */
       }
       
+      /* --- [MODIFICADO] CSS da Sidebar para Mobile --- */
+      .sidebar {
+        position: fixed; /* Fixa na tela */
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100%;
+        z-index: 1001;
+        border-radius: 0;
+        /* Começa escondido fora da tela */
+        transform: translateX(-100%); 
+      }
+      .sidebar.is-open {
+        transform: translateX(0); /* Mostra o menu */
+      }
+      
+      .sidebar-header { 
+        flex-direction: column; /* Volta a ser coluna */
+        align-items: center;
+      }
       .sidebar-nav {
-        flex-direction: row;
-        min-width: 0; /* Corrige bug de overflow do flexbox */
-        overflow-x: auto; /* Permite rolar os botões */
-        padding-bottom: 5px; /* Espaço para a barra de rolagem */
+        flex-direction: column; /* Volta a ser coluna */
+        flex: 1; /* Ocupa espaço */
+        min-width: auto;
+        overflow-x: hidden; /* Não precisa mais de scroll lateral */
+        padding-bottom: 0;
       }
       .nav-btn {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.8rem;
-        flex-shrink: 0; /* Impede que os botões encolham */
-        white-space: nowrap; /* Impede que o texto quebre */
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        flex-shrink: 1;
+        white-space: normal;
       }
       .nav-btn.download-link {
-        display: none; 
+        display: flex; /* Mostra o botão de download */
+        margin-top: auto; /* Empurra para o final */
       }
       .sidebar-footer {
-        display: none;
+        display: block; /* Mostra o footer no mobile */
       }
       
+      /* Mostra o botão de fechar (X) e o de abrir (☰) */
+      .sidebar-close-btn {
+        display: block;
+      }
+      .mobile-menu-toggle {
+        display: block;
+      }
+      /* --- FIM DA MODIFICAÇÃO --- */
+      
+      
       .catalog-wrap {
-        border-radius: var(--radius) var(--radius) 0 0;
+        border-radius: 0; /* Remove bordas no topo */
         flex: 1;
         padding: 1.5rem;
       }
       .links-popup {
         left: 1rem;
         bottom: auto;
-        top: 110px; /* [AJUSTADO] Desce o pop-up para baixo da nova sidebar */
+        top: 60px;
         width: calc(100% - 2rem);
       }
        #comandosPopup, #contatoPopup, #viradaPopup {
-        top: 110px; /* [AJUSTADO] Desce o pop-up para baixo da nova sidebar */
+        top: 60px;
         left: 1rem;
         width: calc(100% - 2rem);
-        max-height: calc(100vh - 120px); 
+        max-height: calc(100vh - 70px); 
       }
     }
 
@@ -525,10 +598,16 @@
 </head>
 <body>
 
+  <button id="menuToggle" class="mobile-menu-toggle" aria-label="Abrir menu">&#9776;</button>
+  
+  <div class="menu-overlay" id="menuOverlay"></div>
+
   <div class="layout-container" role="application">
     
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
+        <button id="menuClose" class="sidebar-close-btn" aria-label="Fechar menu">&times;</button>
+        
         <img src="img/logo-novo-mateus.png" alt="Novo Mateus Logo" class="sidebar-logo">
         <h2 class="sidebar-title">Novo Mateus</h2>
       </div>
@@ -814,6 +893,27 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+    
+      // --- [NOVO] Script do Menu Mobile ---
+      const menuToggle = document.getElementById('menuToggle');
+      const menuClose = document.getElementById('menuClose');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('menuOverlay');
+
+      function openMenu() {
+        if(sidebar) sidebar.classList.add('is-open');
+        if(overlay) overlay.classList.add('is-open');
+      }
+      
+      function closeMenu() {
+        if(sidebar) sidebar.classList.remove('is-open');
+        if(overlay) overlay.classList.remove('is-open');
+      }
+      
+      if(menuToggle) menuToggle.addEventListener('click', openMenu);
+      if(menuClose) menuClose.addEventListener('click', closeMenu);
+      if(overlay) overlay.addEventListener('click', closeMenu);
+      // --- FIM Script Menu Mobile ---
 
       // --- Script dos Pop-ups ---
       const linksBtn = document.getElementById('linksBtn');
@@ -830,6 +930,9 @@
 
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
+          // Fecha o menu mobile primeiro, se estiver aberto
+          closeMenu();
+      
           const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
           const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
           
