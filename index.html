@@ -63,7 +63,7 @@
       backdrop-filter: blur(var(--glass-blur));
       color: white;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease-out; /* [NOVO] Animação de entrada/saída */
+      transition: transform 0.3s ease-out; /* Animação de entrada/saída */
     }
     .sidebar-header {
       display: flex;
@@ -431,8 +431,7 @@
     .card-icon img {
       width: 100%;
       height: 100%;
-      /* [CORREÇÃO] Imagem contida, não cortada */
-      object-fit: contain; 
+      object-fit: contain; /* [CORREÇÃO] Imagem contida, não cortada */
     }
 
     /* --- ESTILO FALLBACK --- */
@@ -461,7 +460,7 @@
       justify-content: center;
     }
     
-    /* --- [NOVO] Estilos do Menu Mobile --- */
+    /* --- Estilos do Menu Mobile --- */
     .menu-overlay {
       display: none;
       position: fixed;
@@ -521,10 +520,10 @@
         min-height: 100vh;
         width: 100%;
         gap: 0;
-        padding-top: 60px; /* [NOVO] Espaço para o botão de menu */
+        padding-top: 60px; /* Espaço para o botão de menu */
       }
       
-      /* --- [MODIFICADO] CSS da Sidebar para Mobile --- */
+      /* --- CSS da Sidebar para Mobile --- */
       .sidebar {
         position: fixed; /* Fixa na tela */
         top: 0;
@@ -533,8 +532,7 @@
         height: 100%;
         z-index: 1001;
         border-radius: 0;
-        /* Começa escondido fora da tela */
-        transform: translateX(-100%); 
+        transform: translateX(-100%); /* Começa escondido */
       }
       .sidebar.is-open {
         transform: translateX(0); /* Mostra o menu */
@@ -565,14 +563,12 @@
         display: block; /* Mostra o footer no mobile */
       }
       
-      /* Mostra o botão de fechar (X) e o de abrir (☰) */
       .sidebar-close-btn {
         display: block;
       }
       .mobile-menu-toggle {
         display: block;
       }
-      /* --- FIM DA MODIFICAÇÃO --- */
       
       
       .catalog-wrap {
@@ -894,7 +890,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
     
-      // --- [NOVO] Script do Menu Mobile ---
+      // --- Script do Menu Mobile ---
       const menuToggle = document.getElementById('menuToggle');
       const menuClose = document.getElementById('menuClose');
       const sidebar = document.getElementById('sidebar');
@@ -1050,15 +1046,21 @@
       });
 
 
-      // --- Animações de Entrada (GSAP) ---
+      // --- [CORREÇÃO] Animações de Entrada (GSAP) ---
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        // Anima a sidebar
-        gsap.from('.sidebar', {
-          duration: 0.8, x: -50, opacity: 0, 
-          ease: 'power2.out', delay: 0.2
-        });
         
-        // Anima o card principal
+        // Verifica se é desktop para animar a sidebar
+        const isDesktop = window.matchMedia('(min-width: 801px)');
+
+        if (isDesktop.matches) {
+          // Anima a sidebar SÓ no desktop
+          gsap.from('.sidebar', {
+            duration: 0.8, x: -50, opacity: 0, 
+            ease: 'power2.out', delay: 0.2
+          });
+        }
+        
+        // Anima o card principal (em todas as telas)
         gsap.from('.catalog-wrap', {
           duration: 0.8, y: 50, opacity: 0, 
           ease: 'power2.out', delay: 0.4
