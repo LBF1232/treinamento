@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POP: Configuração de Impressora Cartaz</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+
+  <style>
+    :root{
+      --novo-1: #F37021; --novo-2: #005A9C;
+      --mateus-1: #D62828; --mateus-2: #F7B733;
+      --bg-start: var(--novo-1); --bg-end: var(--novo-2);
+      --card-bg: rgba(255,255,255,0.86);
+      --glass-blur: 16px;
+      --radius: 20px;
+      --text: #111;
+      --muted: #555;
+      --max-width: 880px;
+      --gap: 1.25rem;
+    }
+
+    /* Respect user preference for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    }
+
+    html { font-size: 15px; box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: inherit; }
+
+    body{
+      min-height:100vh; margin:0; display:flex; 
+      flex-direction: column; 
+      align-items:center; 
+      justify-content:center;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      padding: 2rem;
+      transition: background 1s ease-in-out;
+    }
+
+    /* Container principal */
+    .wizard-wrap{
+      width: 100%;
+      max-width: var(--max-width);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+      overflow: hidden;
+      display:flex; flex-direction:column;
+      border: 1px solid rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+
+    /* Top: título + progress */
+    .wizard-header{
+      padding: 1rem 1.25rem;
+      display:flex; flex-direction:column; gap: 0.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.12));
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .wizard-title{
+      display:flex; align-items:center; gap:0.75rem;
+    }
+    
+    .back-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(255,255,255,0.25));
+      font-weight: 700;
+      color: var(--novo-2);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      text-decoration: none;
+      font-size: 2rem;
+      line-height: 1;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .back-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .brand-badge{
+      width:48px; height:48px; border-radius:10px; display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(255,255,255,0.25));
+      font-weight:700; color:var(--novo-2);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .wizard-title h1{ font-size:1.1rem; margin:0; letter-spacing: -0.2px; }
+    .wizard-meta{ font-size:0.85rem; color:var(--muted); margin-top:2px; }
+
+    /* Progress bar */
+    .progress-wrap{ height:8px; background:rgba(0,0,0,0.04); border-radius:999px; overflow:hidden; }
+    .progress-bar{
+      height:100%; width:0%;
+      background: linear-gradient(90deg,var(--novo-2), var(--mateus-2));
+      transition: width 0.5s ease;
+    }
+
+    /* Stepper nav */
+    .stepper-nav{
+      display:flex; gap:8px; padding: 0.75rem 1rem; overflow-x:auto; align-items:center;
+      list-style:none; margin:0; -webkit-overflow-scrolling:touch;
+    }
+    .stepper-nav::-webkit-scrollbar{ display:none; }
+    .stepper-btn{
+      flex:0 0 auto;
+      border-radius:999px; padding:8px 14px;
+      border: 2px solid var(--novo-2);
+      background:transparent; color:var(--novo-2); font-weight:600; font-size:0.9rem;
+      cursor:pointer; white-space:nowrap;
+      transition: transform 0.18s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+    .stepper-btn:focus{ outline:3px solid rgba(0,90,156,0.12); outline-offset:3px; }
+    .stepper-btn.active{ background:var(--novo-2); color:white; border-color:transparent; transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,90,156,0.12); }
+
+    /* Lógica de "Sliding Track" */
+    .wizard-body{ 
+      width:100%; 
+      min-height:360px; /* Garante que o container tenha altura */
+      position:relative; 
+      overflow: hidden; /* Esconde os outros slides */
+    }
+    .wizard-track{ 
+      display:flex; /* Coloca os slides um ao lado do outro */
+      width:100%; 
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(.22,.9,.2,1); 
+    }
+
+    .step-pane{
+      width:100%; 
+      flex: 0 0 100%; /* Cada slide ocupa 100% da largura */
+      padding:1.25rem 1.5rem 1.75rem 1.5rem; 
+      overflow:auto;
+      max-height: calc(70vh); 
+      min-height: 360px; /* Garante que todos os slides tenham a mesma altura */
+      display: flex;
+      flex-direction: column;
+    }
+
+
+    .step-counter{ 
+      font-size:0.85rem; 
+      font-weight:700; 
+      color:var(--novo-2); 
+      margin-bottom:0.5rem; 
+    }
+    .step-pane h2{ 
+      font-size:1.6rem; 
+      margin:0 0 0.75rem 0; 
+      line-height: 1.2;
+    }
+    .step-pane h3{ 
+      font-size:1.1rem; 
+      margin:1.25rem 0 0.5rem 0; 
+      color: var(--novo-1); 
+    }
+    .step-pane p, .step-pane li{ 
+      font-size:1rem; 
+      line-height:1.55; 
+      color:#333; 
+      margin: 0.5rem 0;
+    }
+    .step-pane ul, .step-pane ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    .step-visual{
+      height:100px; 
+      border-radius:12px; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      background:rgba(0,0,0,0.04); 
+      border:2px dashed rgba(0,0,0,0.06); 
+      cursor:pointer; 
+      margin-bottom:1rem;
+      font-size: 3rem; /* Tamanho do emoji */
+      transition: transform 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+    }
+    .step-visual:focus{ outline:3px solid rgba(0,90,156,0.12); outline-offset:3px; }
+    .step-visual:hover{ transform:scale(1.03); box-shadow: 0 8px 18px rgba(0,0,0,0.06); }
+
+    .info-block{
+      background: rgba(0,90,156,0.06); 
+      border:1px solid rgba(0,90,156,0.12); 
+      padding:1rem; 
+      border-radius:10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; 
+      font-size:0.95rem;
+      margin: 0.75rem 0;
+      word-break: break-all;
+    }
+    .info-block small {
+      display:block; 
+      margin-top:5px;
+      color: var(--muted);
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    
+    .warning-block{
+      background: rgba(214,40,40,0.08); 
+      border:1px solid rgba(214,40,40,0.2); 
+      padding:1rem; 
+      border-radius:10px;
+      color:#D62828; 
+      font-weight:600;
+      margin: 0.75rem 0;
+    }
+
+    /* Navigation footer */
+    .wizard-footer{
+      padding:0.9rem 1.25rem; 
+      display:flex; 
+      align-items:center; 
+      justify-content:space-between;
+      border-top:1px solid rgba(0,0,0,0.05); 
+      gap:10px; 
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    }
+    .wizard-navigation{ display:flex; gap:0.75rem; align-items:center; }
+    .btn{
+      padding:0.6rem 1rem; 
+      border-radius:10px; 
+      border:none; 
+      cursor:pointer; 
+      font-weight:700; 
+      font-size:0.98rem;
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+    .btn:active{ transform:translateY(1px); }
+    #prevBtn{ background:#f0f0f0; color:#333; }
+    #nextBtn{ background:var(--novo-2); color:white; box-shadow: 0 8px 22px rgba(0,90,156,0.14); }
+
+    .btn[disabled]{ opacity:0.6; cursor:not-allowed; filter:grayscale(0.2); }
+
+    .step-indicator{ font-weight:700; color:var(--muted); }
+
+    /* Lightbox */
+    .lightbox{
+      position:fixed; inset:0; display:none; z-index:9000; justify-content:center; align-items:center;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      opacity:0; transition: opacity 0.28s ease;
+    }
+    .lightbox.visible{ display:flex; opacity:1; }
+    .lightbox-content{
+      max-width:92%; max-height:86%; display:grid; place-items:center; color:white;
+      font-size:8rem; transform:scale(0.9); transition: transform 0.28s ease;
+    }
+    .lightbox.visible .lightbox-content{ transform:scale(1); }
+    .close-lightbox{ position:absolute; top:1.25rem; right:1.25rem; font-size:2.2rem; color:#fff; cursor:pointer; background:transparent; border:none; }
+
+    /* Estilos para Conteúdo Extra */
+    .extras-wrap {
+      width: 100%;
+      max-width: var(--max-width);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.6);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 35% 1fr;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    .extras-wrap h3 {
+      font-size: 1.3rem;
+      margin:0 0 0.75rem 0;
+      color: var(--text);
+    }
+    
+    .download-box .info-block {
+      margin: 0;
+      padding: 0.5rem 1rem;
+      text-align: center;
+      font-size: 1rem;
+      font-family: -apple-system, "Segoe UI", Roboto;
+    }
+    .download-box .info-block strong {
+      font-size: 1.1rem;
+      color: var(--novo-2);
+    }
+
+    .download-btn-pdf {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem; 
+      border-radius: 10px;
+      border: 2px solid var(--novo-2);
+      background: var(--novo-2);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .download-btn-pdf:hover {
+      background: var(--novo-1);
+      border-color: var(--novo-1);
+    }
+
+
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #000;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    /* Fim dos Estilos */
+
+
+    /* Responsive */
+    @media (max-width:720px){
+      :root{ --max-width: 100%; }
+      body { padding: 0.5rem; }
+      .wizard-wrap { border-radius: 10px; }
+      .step-pane{ padding:1rem; }
+      .wizard-header{ padding:0.75rem; }
+      .wizard-footer{ padding:0.75rem; }
+      .step-visual{ height:110px; }
+      .brand-badge{ width:44px; height:44px; }
+      .back-btn { width: 44px; height: 44px; font-size: 1.8rem; } 
+      .wizard-body{ min-height:360px; }
+      .step-pane{ min-height: 360px; } 
+      .step-pane h2 { font-size: 1.4rem; }
+      
+      .extras-wrap {
+        grid-template-columns: 1fr; /* Coluna única */
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wizard-wrap" role="application" aria-labelledby="wizardTitle">
+    <header class="wizard-header">
+      <div class="wizard-title">
+        <a href="index.html" class="back-btn" aria-label="Voltar ao catálogo">&larr;</a>
+        <div class="brand-badge" aria-hidden="true">🖨️</div>
+        <div>
+          <h1 id="wizardTitle">POP: Atualização de Endereço IP de Impressoras</h1>
+          <div class="wizard-meta">Cartaz / Banner</div>
+        </div>
+      </div>
+
+      <div class="progress-wrap" aria-hidden="true">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+
+      <nav class="stepper-nav" id="stepperNav" aria-label="Navegação das etapas" role="navigation">
+        <button class="stepper-btn active" data-step-index="0">1. Acessar Impressoras</button>
+        <button class="stepper-btn" data-step-index="1">2. Propriedades</button>
+        <button class="stepper-btn" data-step-index="2">3. Configurar Porta</button>
+        <button class="stepper-btn" data-step-index="3">4. Atualizar IP</button>
+        <button class="stepper-btn" data-step-index="4">5. Salvar</button>
+      </nav>
+    </header>
+
+    <main class="wizard-body" id="wizardBody">
+      <div class="wizard-track" id="wizardTrack" aria-live="polite" aria-atomic="true">
+
+        <section class="step-pane" role="region" aria-labelledby="step1title">
+          <div class="step-counter">Etapa 1 de 5</div>
+          <h2 id="step1title">Acessar as Configurações da Impressora</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de configurações" data-zoom-content="⚙️">⚙️</div>
+          <ol>
+            <li>No Windows, abra a seção <strong>"Impressoras e scanners"</strong>.</li>
+            <li>Localize na lista a impressora que teve seu IP alterado (ex: "Banner", "Cartaz A3" ou "Cartaz A4").</li>
+            <li>Clique na impressora desejada e selecione <strong>"Gerenciar"</strong>.</li>
+          </ol>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step2title">
+          <div class="step-counter">Etapa 2 de 5</div>
+          <h2 id="step2title">Acessar as Propriedades de Porta</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de documento" data-zoom-content="📑">📑</div>
+          <ol>
+            <li>Na tela "Gerenciar seu dispositivo", clique em <strong>"Propriedades da impressora"</strong>.</li>
+            <li>Uma nova janela de "Propriedades" será aberta.</li>
+            <li>Nela, clique na aba <strong>"Portas"</strong>.</li>
+          </ol>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step3title">
+          <div class="step-counter">Etapa 3 de 5</div>
+          <h2 id="step3title">Localizar e Configurar a Porta TCP/IP</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de porta" data-zoom-content="🔌">🔌</div>
+          <ol>
+            <li>Na lista de portas, role para baixo até encontrar a porta que está <strong>marcada</strong> (check-box selecionado).</li>
+            <li>Ela será do tipo "Porta TCP/IP Padrão".</li>
+            <li>Com esta porta selecionada, clique no botão <strong>"Configurar Porta..."</strong>.</li>
+          </ol>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step4title">
+          <div class="step-counter">Etapa 4 de 5</div>
+          <h2 id="step4title">Atualizar o Endereço IP</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de editar" data-zoom-content="✏️">✏️</div>
+          <p>Uma janela "Configurar Monitor de Porta TCP/IP Padrão" será exibida.</p>
+          <p>O campo "Nome da Impressora ou Endereço IP" mostrará o IP antigo (ex: 192.168.43.160).</p>
+          <div class="warning-block">
+            <strong>Ação:</strong> Altere o valor deste campo para o <strong>novo endereço IP</strong> que você definiu na impressora física.
+          </div>
+        </section>
+
+        <section class="step-pane" role="region" aria-labelledby="step5title">
+          <div class="step-counter">Etapa 5 de 5</div>
+          <h2 id="step5title">Salvar e Finalizar</h2>
+          <div class="step-visual" tabindex="0" role="button" aria-label="Ampliar ícone de check" data-zoom-content="✅">✅</div>
+          <ol>
+            <li>Clique em <strong>"OK"</strong> para fechar a janela de configuração da porta.</li>
+            <li>Clique em <strong>"Aplicar"</strong> ou "OK" na janela de Propriedades.</li>
+          </ol>
+          <p>Após salvar, o computador reconhecerá a impressora com o novo IP.</p>
+          <div class="info-block">
+            <small>Este processo é o mesmo para as impressoras "Cartaz A4", "A3" e "Banner".</small>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="wizard-footer" role="contentinfo">
+      <div class="step-indicator" id="stepIndicator" aria-live="polite">Etapa 1 / 5</div>
+      <div class="wizard-navigation" aria-hidden="false">
+        <button id="prevBtn" class="btn" aria-label="Etapa anterior">Anterior</button>
+        <button id="nextBtn" class="btn" aria-label="Próxima etapa">Seguir</button>
+      </div>
+    </footer>
+  </div>
+
+  <div class="extras-wrap">
+    
+    <div class="download-box">
+      <h3>Download do POP</h3>
+      <div class="info-block">
+        <small>Clique no botão abaixo para baixar a versão em PDF deste procedimento.</small>
+      </div>
+      
+      <a href="pdf/cartaz.pdf" class="download-btn-pdf" aria-label="Baixar POP em PDF" download>
+        &#x21E9; Baixar PDF
+      </a>
+      
+    </div>
+
+    <div class="video-box">
+      <h3>Vídeo de Referência</h3>
+      <div class="video-container">
+        <iframe 
+          src="https://www.youtube.com/embed/DW4Ap8YEazY" 
+          title="YouTube video player" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Visualização ampliada">
+    <button class="close-lightbox" id="closeLightbox" aria-label="Fechar visualização">&times;</button>
+    <div class="lightbox-content" id="lightboxContent" tabindex="0"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // --- [REMOVIDO] Script da Senha do Dia ---
+
+      // --- Script do Wizard ---
+      const wizardTrack = document.getElementById('wizardTrack');
+      const stepPanes = Array.from(document.querySelectorAll('.step-pane'));
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const stepIndicator = document.getElementById('stepIndicator');
+      const progressBar = document.getElementById('progressBar');
+      const stepperNav = document.getElementById('stepperNav');
+      const stepperButtons = Array.from(stepperNav.querySelectorAll('.stepper-btn'));
+      const lightbox = document.getElementById('lightbox');
+      const lightboxContent = document.getElementById('lightboxContent');
+      const closeLightbox = document.getElementById('closeLightbox');
+
+      if (!wizardTrack || !prevBtn || !nextBtn || !stepperNav) {
+        console.error("Erro: Elementos essenciais do wizard não foram encontrados.");
+        return; 
+      }
+
+      const totalSteps = stepPanes.length;
+      let currentStep = 0;
+      
+      // Trava de animação
+      let isAnimating = false;
+      // Duração da animação (600ms = 0.6s do seu CSS)
+      const animationDuration = 600; 
+
+      // --- Função: mostrar etapa ---
+      function showStep(stepIndex, opts = {}) {
+        
+        // Se estiver animando, ignora o clique
+        if (isAnimating && !opts.force) return;
+
+        stepIndex = Math.max(0, Math.min(stepIndex, totalSteps - 1));
+        
+        // Se já estiver na etapa, não faz nada
+        if (stepIndex === currentStep && !opts.force) {
+            // Se for forçado (primeiro load), libera a trava
+            if(opts.force) isAnimating = false;
+            return;
+        }
+
+        // Ativa a trava
+        isAnimating = true;
+        currentStep = stepIndex;
+
+        // Lógica de "deslizar" (transform)
+        const offset = -currentStep * 100;
+        wizardTrack.style.transform = `translateX(${offset}%)`;
+        
+        prevBtn.disabled = currentStep === 0;
+        nextBtn.disabled = false;
+        nextBtn.textContent = (currentStep === totalSteps - 1) ? 'Finalizar' : 'Seguir';
+
+        stepperButtons.forEach((btn) => {
+          const btnIndex = parseInt(btn.dataset.stepIndex, 10);
+          const isActive = (btnIndex === currentStep);
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        stepIndicator.textContent = `Etapa ${currentStep + 1} / ${totalSteps}`;
+        const percent = ((currentStep + 1) / totalSteps) * 100;
+        progressBar.style.width = `${percent}%`;
+
+        const activeBtn = stepperButtons[currentStep];
+        if (activeBtn) activeBtn.scrollIntoView({behavior: 'smooth', inline: 'center'});
+        
+        // Animação do fundo
+        animateBackground(currentStep);
+
+        const currentPane = stepPanes[currentStep];
+        if(currentPane) {
+          currentPane.querySelectorAll('button, [tabindex], a, input').forEach(el => el.setAttribute('tabindex','0'));
+          currentPane.focus?.();
+        }
+        
+        // Libera a trava após a animação de 0.6s terminar
+        setTimeout(() => {
+            isAnimating = false;
+        }, animationDuration);
+      }
+
+      // --- Next / Prev ---
+      nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps - 1) {
+          showStep(currentStep + 1);
+        } else {
+          gsap.to(nextBtn, {scale:1.06, duration:0.12, yoyo:true, repeat:1});
+          gsap.fromTo(stepperNav, {backgroundColor:'rgba(0,0,0,0)'}, {backgroundColor:'rgba(0,0,0,0.02)', duration:0.4});
+        }
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) showStep(currentStep - 1);
+      });
+
+      // --- Stepper click ---
+      stepperButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(btn.dataset.stepIndex, 10);
+          if (!Number.isNaN(idx)) showStep(idx);
+        });
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault(); btn.click();
+          }
+        });
+      });
+
+      // --- Lightbox (ampliar) ---
+      document.querySelectorAll('.step-visual').forEach(visual => {
+        visual.addEventListener('click', () => {
+          const content = visual.getAttribute('data-zoom-content') || visual.innerText;
+          openLightbox(content);
+        });
+        visual.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault(); visual.click();
+          }
+        });
+      });
+
+      function openLightbox(content){
+        if (!lightbox || !lightboxContent || !closeLightbox) return;
+        lightboxContent.innerHTML = content;
+        lightbox.classList.add('visible');
+        lightbox.setAttribute('aria-hidden','false');
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          gsap.fromTo('.lightbox-content', {scale:0.94, opacity:0}, {scale:1, opacity:1, duration:0.28, ease:'power2.out'});
+        }
+        closeLightbox.focus();
+      }
+      
+      function closeZoom(){
+        if (!lightbox) return;
+        lightbox.classList.remove('visible');
+        lightbox.setAttribute('aria-hidden','true');
+      }
+      
+      if (closeLightbox) closeLightbox.addEventListener('click', closeZoom);
+      if (lightbox) lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeZoom();
+      });
+
+      // --- Keyboard global ---
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          if (currentStep < totalSteps -1) showStep(currentStep + 1);
+        } else if (e.key === 'ArrowLeft') {
+          if (currentStep > 0) showStep(currentStep - 1);
+        } else if (e.key === 'Home') {
+          showStep(0);
+        } else if (e.key === 'End') {
+          showStep(totalSteps - 1);
+        } else if (e.key === 'Escape') {
+          if (lightbox && lightbox.classList.contains('visible')) closeZoom();
+        }
+      });
+
+      // --- Função: anima background ---
+      function animateBackground(stepIndex){
+        const progress = (totalSteps > 1) ? (stepIndex / (totalSteps - 1)) : 0;
+        const grad = `linear-gradient(135deg, ${lerpColor('#F37021','#D62828', progress)}, ${lerpColor('#005A9C','#F7B733', progress)})`;
+        gsap.to(document.body, {background: grad, duration:1.0, ease:'power1.inOut'});
+        const nextColor = lerpColor('#005A9C','#D62828', progress);
+        gsap.to(nextBtn, {backgroundColor: nextColor, duration:0.9});
+        stepperButtons.forEach((b,idx) => {
+          const btnIndex = parseInt(b.dataset.stepIndex, 10);
+          const isActive = (btnIndex === currentStep);
+          if (isActive) gsap.to(b, {backgroundColor: nextColor, color:'#fff', borderColor: nextColor, duration:0.9});
+          else gsap.to(b, {backgroundColor: 'transparent', color: nextColor, borderColor: nextColor, duration:0.9});
+        });
+      }
+
+      // --- Helper: interpolação de cor ---
+      function lerpColor(a, b, amount) {
+        const ah = parseInt(a.replace('#',''),16), bh = parseInt(b.replace('#',''),16);
+        const ar = ah >> 16, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
+        const br = bh >> 16, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+        const rr = Math.round(ar + (br - ar) * amount);
+        const rg = Math.round(ag + (bg - ag) * amount);
+        const rb = Math.round(ab + (bb - ab) * amount);
+        return `#${(rr<<16 | rg<<8 | rb).toString(16).padStart(6,'0')}`;
+      }
+
+      // --- Inicializar ---
+      showStep(0, {force: true}); 
+
+
+      // --- A11y ---
+      stepperButtons.forEach((b, idx) => {
+        b.setAttribute('role','button');
+        b.setAttribute('aria-controls','wizardTrack');
+        b.setAttribute('aria-label', `Ir para etapa ${idx+1}`);
+        b.tabIndex = 0;
+      });
+
+      stepperNav.addEventListener('touchmove', (e) => { e.stopPropagation(); }, {passive:true});
+    
+    }); // <-- Fim do DOMContentLoaded
+  </script>
+</body>
+</html>
