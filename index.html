@@ -431,7 +431,8 @@
     .card-icon img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* [CORREÇÃO] Imagem contida, não cortada */
+      /* [CORREÇÃO] Imagem contida, não cortada */
+      object-fit: contain; 
     }
 
     /* --- ESTILO FALLBACK --- */
@@ -460,7 +461,45 @@
       justify-content: center;
     }
     
-    /* --- Estilos do Menu Mobile --- */
+    /* --- [NOVO] Estilos do Menu Mobile --- */
+    .mobile-header {
+      display: none; /* Escondido no desktop */
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      padding: 0 1rem;
+      background: var(--card-bg);
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      z-index: 998;
+      align-items: center;
+      gap: 1rem;
+    }
+    .mobile-menu-toggle {
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border: none;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      padding: 0;
+    }
+    .mobile-header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mobile-header-logo .sidebar-logo { /* Reutiliza o estilo */
+      max-width: 36px;
+      padding: 3px;
+    }
+    .mobile-header-logo .sidebar-title { /* Reutiliza o estilo */
+      font-size: 1.1rem;
+      color: var(--text); /* Texto escuro no header claro */
+    }
+
     .menu-overlay {
       display: none;
       position: fixed;
@@ -473,24 +512,6 @@
     .menu-overlay.is-open {
       display: block;
       opacity: 1;
-    }
-    
-    .mobile-menu-toggle {
-      display: none; /* Escondido no desktop */
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      width: 44px;
-      height: 44px;
-      background: var(--card-bg);
-      border: 1px solid rgba(255,255,255,0.6);
-      border-radius: 10px;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      z-index: 999;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
     .sidebar-close-btn {
@@ -520,7 +541,7 @@
         min-height: 100vh;
         width: 100%;
         gap: 0;
-        padding-top: 60px; /* Espaço para o botão de menu */
+        padding-top: 60px; /* Espaço para o novo header */
       }
       
       /* --- CSS da Sidebar para Mobile --- */
@@ -539,14 +560,14 @@
       }
       
       .sidebar-header { 
-        flex-direction: column; /* Volta a ser coluna */
+        flex-direction: column; 
         align-items: center;
       }
       .sidebar-nav {
-        flex-direction: column; /* Volta a ser coluna */
-        flex: 1; /* Ocupa espaço */
+        flex-direction: column; 
+        flex: 1; 
         min-width: auto;
-        overflow-x: hidden; /* Não precisa mais de scroll lateral */
+        overflow-x: hidden; 
         padding-bottom: 0;
       }
       .nav-btn {
@@ -556,37 +577,37 @@
         white-space: normal;
       }
       .nav-btn.download-link {
-        display: flex; /* Mostra o botão de download */
-        margin-top: auto; /* Empurra para o final */
+        display: flex; 
+        margin-top: auto; 
       }
       .sidebar-footer {
-        display: block; /* Mostra o footer no mobile */
+        display: block; 
       }
       
       .sidebar-close-btn {
         display: block;
       }
-      .mobile-menu-toggle {
-        display: block;
+      .mobile-header {
+        display: flex;
       }
       
       
       .catalog-wrap {
-        border-radius: 0; /* Remove bordas no topo */
+        border-radius: 0; 
         flex: 1;
         padding: 1.5rem;
       }
       .links-popup {
         left: 1rem;
         bottom: auto;
-        top: 60px;
+        top: 70px;
         width: calc(100% - 2rem);
       }
        #comandosPopup, #contatoPopup, #viradaPopup {
-        top: 60px;
+        top: 70px;
         left: 1rem;
         width: calc(100% - 2rem);
-        max-height: calc(100vh - 70px); 
+        max-height: calc(100vh - 80px); 
       }
     }
 
@@ -594,7 +615,13 @@
 </head>
 <body>
 
-  <button id="menuToggle" class="mobile-menu-toggle" aria-label="Abrir menu">&#9776;</button>
+  <div class="mobile-header" id="mobileHeader">
+    <button id="menuToggle" class="mobile-menu-toggle" aria-label="Abrir menu">&#9776;</button>
+    <div class="mobile-header-logo">
+      <img src="img/logo-novo-mateus.png" alt="Novo Mateus Logo" class="sidebar-logo">
+      <h2 class="sidebar-title">Novo Mateus</h2>
+    </div>
+  </div>
   
   <div class="menu-overlay" id="menuOverlay"></div>
 
@@ -926,8 +953,9 @@
 
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
-          // Fecha o menu mobile primeiro, se estiver aberto
-          closeMenu();
+          
+          // [CORREÇÃO] Remove a linha que fecha o menu
+          // closeMenu(); 
       
           const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
           const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
