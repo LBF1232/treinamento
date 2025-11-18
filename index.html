@@ -134,7 +134,7 @@
     }
 
 
-    /* --- [CORREÇÃO] POP-UP DE LINKS (Z-INDEX) --- */
+    /* --- POP-UP DE LINKS --- */
     .links-popup {
       display: none; 
       position: absolute;
@@ -147,7 +147,6 @@
       border-radius: 12px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.2);
       backdrop-filter: blur(var(--glass-blur));
-      /* Z-index deve ser maior que o da sidebar (1001) */
       z-index: 1002; 
       padding: 0.75rem;
       opacity: 0;
@@ -462,7 +461,6 @@
     }
     
     /* --- Estilos do Menu Mobile --- */
-    /* [NOVO] Cabeçalho fixo no mobile */
     .mobile-header {
       display: none; /* Escondido no desktop */
       position: fixed;
@@ -492,14 +490,13 @@
       align-items: center;
       gap: 0.5rem;
     }
-    .mobile-header-logo .sidebar-logo { /* Reutiliza o estilo */
-      /* [CORREÇÃO] Logo maior */
+    .mobile-header-logo .sidebar-logo { 
       max-width: 44px;
       padding: 4px;
     }
-    .mobile-header-logo .sidebar-title { /* Reutiliza o estilo */
+    .mobile-header-logo .sidebar-title { 
       font-size: 1.2rem;
-      color: var(--text); /* Texto escuro no header claro */
+      color: var(--text); 
     }
 
     .menu-overlay {
@@ -533,7 +530,6 @@
       cursor: pointer;
     }
     
-    /* [NOVO] Botão de Fechar para Pop-ups (só no mobile) */
     .popup-close-btn {
       display: none; 
       position: absolute;
@@ -631,7 +627,6 @@
         max-height: calc(100vh - 80px); 
       }
       
-      /* [NOVO] Mostra o 'X' no mobile e ajusta o título */
       .popup-close-btn {
         display: block;
       }
@@ -756,6 +751,13 @@
               <img src="img/dominio.png" alt="Ilustração de ingresso de domínio">
             </div>
             <span class="card-title">Ingresso de Dominio</span>
+          </a>
+          
+          <a href="treinamento-faturamento.html" class="training-card" aria-label="Iniciar treinamento: Ingresso de PC Faturamento">
+            <div class="card-icon">
+              <img src="img/faturamento.png" alt="Ilustração de faturamento">
+            </div>
+            <span class="card-title">Ingresso de PC Faturamento</span>
           </a>
           
           </div>
@@ -984,15 +986,15 @@
       const viradaBtn = document.getElementById('viradaBtn');
       const viradaPopup = document.getElementById('viradaPopup');
 
+      const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
+      const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
+
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
           
-          // [MODIFICADO] Não fecha mais o menu principal ao clicar
+          // [CORREÇÃO] Não fecha o menu principal ao clicar
           // closeMenu(); 
       
-          const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
-          const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
-          
           let isVisible;
 
           allPopups.forEach((p, index) => {
@@ -1040,39 +1042,23 @@
 
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
-        const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
-        const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
-        const isClickInsideContato = contatoPopup && contatoPopup.contains(e.target);
-        const isClickInsideVirada = viradaPopup && viradaPopup.contains(e.target); 
-        
-        const isLinksBtn = e.target === linksBtn;
-        const isComandosBtn = e.target === comandosBtn;
-        const isContatoBtn = e.target === contatoBtn;
-        const isViradaBtn = e.target === viradaBtn; 
+        const isClickInsideAnyPopup = allPopups.some(p => p && p.contains(e.target));
+        const isClickInsideAnyBtn = allBtns.some(b => b && b.contains(e.target));
 
-        if (!isClickInsideLinks && !isClickInsideComandos && !isClickInsideContato && !isClickInsideVirada && !isLinksBtn && !isComandosBtn && !isContatoBtn && !isViradaBtn) {
-          if(linksPopup) linksPopup.classList.remove('visible');
-          if(comandosPopup) comandosPopup.classList.remove('visible');
-          if(contatoPopup) contatoPopup.classList.remove('visible');
-          if(viradaPopup) viradaPopup.classList.remove('visible'); 
-          
-          if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
-          if(comandosBtn) comandosBtn.setAttribute('aria-expanded', 'false');
-          if(contatoBtn) contatoBtn.setAttribute('aria-expanded', 'false');
-          if(viradaBtn) viradaBtn.setAttribute('aria-expanded', 'false'); 
+        if (!isClickInsideAnyPopup && !isClickInsideAnyBtn) {
+          allPopups.forEach(p => { if(p) p.classList.remove('visible'); });
+          allBtns.forEach(b => { if(b) b.setAttribute('aria-expanded', 'false'); });
         }
       });
 
-      // --- [NOVO] Script de Fechar Pop-ups Internos ---
+      // --- Script de Fechar Pop-ups Internos (Mobile) ---
       document.querySelectorAll('.popup-close-btn').forEach(button => {
         button.addEventListener('click', (e) => {
           e.stopPropagation();
-          // Encontra o pop-up pai e o esconde
           const popup = e.target.closest('.links-popup');
           if (popup) {
             popup.classList.remove('visible');
             
-            // Também atualiza o aria-expanded do botão da sidebar
             const btnId = popup.id.replace('Popup', 'Btn'); // ex: linksPopup -> linksBtn
             const sidebarBtn = document.getElementById(btnId);
             if (sidebarBtn) {
@@ -1126,7 +1112,7 @@
       });
 
 
-      // --- [CORREÇÃO] Animações de Entrada (GSAP) ---
+      // --- Animações de Entrada (GSAP) ---
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         
         // Verifica se é desktop para animar a sidebar
