@@ -210,8 +210,8 @@
     }
     .go-btn:active { transform: scale(0.95); }
 
-    /* --- POP-UP DE COMANDOS --- */
-    #comandosPopup, #contatoPopup, #viradaPopup {
+    /* --- POP-UP DE COMANDOS E OUTROS --- */
+    #comandosPopup, #contatoPopup, #viradaPopup, #criticoPopup {
       width: 420px; 
       bottom: auto; 
       top: 1.5rem; 
@@ -220,6 +220,12 @@
       max-height: calc(90vh - 4rem); 
       overflow-y: auto; 
       overflow-x: hidden;
+    }
+    
+    /* Estilo específico para o popup Crítico */
+    #criticoPopup {
+      width: 500px; /* Um pouco mais largo para leitura */
+      border: 2px solid #D62828; /* Borda vermelha de alerta */
     }
 
     #comandosPopup h4, #contatoPopup h4, #viradaPopup h4 {
@@ -345,25 +351,54 @@
       color: var(--text);
     }
 
-    /* --- Estilos do Pop-up Virada --- */
-    #viradaPopup .info-block {
+    /* --- Estilos dos Pop-ups de Texto (Virada e Crítico) --- */
+    #viradaPopup .info-block, #criticoPopup .info-block {
       font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       font-size: 0.95rem;
       line-height: 1.5;
     }
-    #viradaPopup .info-block p {
+    #viradaPopup .info-block p { margin: 0.5rem 0; color: var(--text); font-weight: 600; }
+    #viradaPopup ul { padding-left: 1.5rem; margin-top: 0.5rem; font-weight: 600; color: var(--text); }
+    #viradaPopup ul li { margin-bottom: 0.5rem; }
+
+    /* Estilos específicos para Informações Críticas */
+    .alert-box {
+      background-color: rgba(214, 40, 40, 0.1);
+      border: 1px solid #D62828;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      color: #D62828;
+    }
+    .alert-box h4 {
+      margin: 0 0 0.5rem 0 !important;
+      color: #D62828 !important;
+      border-bottom: none !important;
+    }
+    .critic-section {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .critic-section:last-child { border-bottom: none; }
+    .critic-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .critic-scenario { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.5rem; font-style: italic; }
+    .critic-rule {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-weight: 700;
       margin: 0.5rem 0;
-      color: var(--text);
-      font-weight: 600;
-    }
-    #viradaPopup ul {
-      padding-left: 1.5rem; 
-      margin-top: 0.5rem; 
-      font-weight: 600; 
-      color: var(--text);
-    }
-    #viradaPopup ul li {
-       margin-bottom: 0.5rem;
+      border-left: 4px solid #D62828;
     }
 
 
@@ -461,7 +496,7 @@
     }
     
     /* --- Estilos do Menu Mobile --- */
-    /* [NOVO] Cabeçalho fixo no mobile */
+    /* Cabeçalho fixo no mobile */
     .mobile-header {
       display: none; /* Escondido no desktop */
       position: fixed;
@@ -621,7 +656,7 @@
         top: 70px;
         width: calc(100% - 2rem);
       }
-       #comandosPopup, #contatoPopup, #viradaPopup {
+       #comandosPopup, #contatoPopup, #viradaPopup, #criticoPopup {
         top: 70px;
         left: 1rem;
         width: calc(100% - 2rem);
@@ -640,6 +675,7 @@
 </head>
 <body>
 
+  <!-- Cabeçalho Mobile Fixo -->
   <div class="mobile-header" id="mobileHeader">
     <button id="menuToggle" class="mobile-menu-toggle" aria-label="Abrir menu">&#9776;</button>
     <div class="mobile-header-logo">
@@ -648,12 +684,15 @@
     </div>
   </div>
   
+  <!-- Overlay para fechar o menu -->
   <div class="menu-overlay" id="menuOverlay"></div>
 
   <div class="layout-container" role="application">
     
+    <!-- 1. MENU LATERAL (Botões adicionados) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
+        <!-- Botão de Fechar Menu Mobile (X) -->
         <button id="menuClose" class="sidebar-close-btn" aria-label="Fechar menu">&times;</button>
         
         <img src="img/logo-novo-mateus.png" alt="Novo Mateus Logo" class="sidebar-logo">
@@ -680,24 +719,33 @@
           <span>🔄</span>
           <span>Virada de Loja</span>
         </button>
+        <!-- [NOVO] Botão Informações Críticas -->
+        <button class="nav-btn" id="criticoBtn" aria-haspopup="true" style="color: #D62828; font-weight: 800;">
+          <span>🚨</span>
+          <span>INFORMAÇÕES CRÍTICAS</span>
+        </button>
       </nav>
        <a href="https://drive.google.com/drive/folders/1pOh4G00xKVwG0NV5VXTM4krAPy9Y_XUJ" target="_blank" class="nav-btn download-link">
           <span>📱</span>
           <span>Download App Novo Mateus</span>
        </a>
       
+      <!-- Footer -->
       <div class="sidebar-footer">
         Desenvolvido por Leonardo Freire
       </div>
     </aside>
 
+    <!-- 2. CONTEÚDO PRINCIPAL (CATÁLOGO) -->
     <main class="main-content">
       <div class="catalog-wrap">
         <h1>Catálogo de Treinamentos</h1>
         <p class="catalog-subtitle">Selecione um guia passo a passo para começar.</p>
 
+        <!-- O grid com os cards -->
         <div class="training-grid">
 
+          <!-- Item 1: Treinamento de PDV -->
           <a href="treinamento-pdv.html" class="training-card" aria-label="Iniciar treinamento: Formatação de PDV">
             <div class="card-icon">
               <img src="img/pdv.png" alt="Ilustração da Formatação de PDV">
@@ -705,6 +753,7 @@
             <span class="card-title">Formatação de PDV</span>
           </a>
 
+          <!-- Item 2: Configuração de Periféricos -->
           <a href="treinamento-perifericos.html" class="training-card" aria-label="Iniciar treinamento: Configuração de Periféricos">
             <div class="card-icon">
               <img src="img/perifericos.png" alt="Ilustração de periféricos">
@@ -712,6 +761,7 @@
             <span class="card-title">Configuração de Periféricos</span>
           </a>
 
+          <!-- Item 3: Configuração de Balança -->
           <a href="treinamento-balanca.html" class="training-card" aria-label="Iniciar treinamento: Configuração de Balança">
             <div class="card-icon">
               <img src="img/balanca.png" alt="Ilustração de uma balança">
@@ -719,6 +769,7 @@
             <span class="card-title">Configuração de Balança</span>
           </a>
 
+          <!-- Item 4: Carga de Balança -->
           <a href="treinamento-carga-balanca.html" class="training-card" aria-label="Iniciar treinamento: Carga de Balança e MGV">
             <div class="card-icon">
               <img src="img/carga.png" alt="Ilustração de Carga de Balança">
@@ -726,6 +777,7 @@
             <span class="card-title">Carga de Balança e MGV</span>
           </a>
           
+          <!-- Item 5: Abertura de Chamado -->
           <a href="treinamento-chamado.html" class="training-card" aria-label="Iniciar treinamento: Abertura de Chamado">
             <div class="card-icon">
               <img src="img/chamado.png" alt="Ilustração de Abertura de Chamado">
@@ -733,6 +785,7 @@
             <span class="card-title">Abertura de Chamado</span>
           </a>
 
+          <!-- Item 6: Auditoria - Coletor -->
           <a href="treinamento-auditoria.html" class="training-card" aria-label="Iniciar treinamento: Auditoria - Coletor">
             <div class="card-icon">
               <img src="img/coletor.png" alt="Ilustração de um coletor de dados">
@@ -740,6 +793,7 @@
             <span class="card-title">Auditoria - Coletor</span>
           </a>
           
+          <!-- Item 7: Configurar IP impressora Cartaz -->
           <a href="treinamento-cartaz.html" class="training-card" aria-label="Iniciar treinamento: Configurar IP impressora Cartaz">
             <div class="card-icon">
               <img src="img/cartaz.png" alt="Ilustração de uma impressora de cartaz">
@@ -747,6 +801,7 @@
             <span class="card-title">Configurar IP impressora Cartaz</span>
           </a>
           
+          <!-- Item 8: Ingresso de Dominio -->
           <a href="treinamento-dominio.html" class="training-card" aria-label="Iniciar treinamento: Ingresso de Dominio">
             <div class="card-icon">
               <img src="img/dominio.png" alt="Ilustração de ingresso de domínio">
@@ -754,6 +809,7 @@
             <span class="card-title">Ingresso de Dominio</span>
           </a>
           
+          <!-- Item 9: Ingresso de PC Faturamento -->
           <a href="treinamento-faturamento.html" class="training-card" aria-label="Iniciar treinamento: Ingresso de PC Faturamento">
             <div class="card-icon">
               <img src="img/faturamento.png" alt="Ilustração de faturamento">
@@ -761,6 +817,7 @@
             <span class="card-title">Ingresso de PC Faturamento</span>
           </a>
 
+          <!-- Item 10: Emissão de etiqueta de Flutuação -->
           <a href="treinamento-etiqueta.html" class="training-card" aria-label="Iniciar treinamento: Emissão de etiqueta de Flutuação">
             <div class="card-icon">
               <img src="img/etiqueta.png" alt="Ilustração de etiqueta de preço">
@@ -768,6 +825,7 @@
             <span class="card-title">Emissão de etiqueta de Flutuação</span>
           </a>
 
+          <!-- Item 11: Emissão de Relatório de Flutuação -->
           <a href="treinamento-relatorio.html" class="training-card" aria-label="Iniciar treinamento: Emissão de Relatório de Flutuação">
             <div class="card-icon">
               <img src="img/relatorio.png" alt="Ilustração de relatório">
@@ -775,6 +833,7 @@
             <span class="card-title">Emissão de Relatório de Flutuação</span>
           </a>
 
+          <!-- Item 12: Etiqueta de Rebaixa -->
           <a href="treinamento-rebaixa.html" class="training-card" aria-label="Iniciar treinamento: Emissão de Etiqueta de Rebaixa">
             <div class="card-icon">
               <img src="img/rebaixa.png" alt="Ilustração de etiqueta de rebaixa">
@@ -782,6 +841,7 @@
             <span class="card-title">Etiqueta de Rebaixa</span>
           </a>
 
+          <!-- Item 13: Impressão Folha Cartaz -->
           <a href="treinamento-cartazista.html" class="training-card" aria-label="Iniciar treinamento: Impressão Folha Cartaz">
             <div class="card-icon">
               <img src="img/cartazista.png" alt="Ilustração de impressão de cartazes">
@@ -789,6 +849,7 @@
             <span class="card-title">Impressão Folha Cartaz</span>
           </a>
 
+          <!-- Item 14: Impressora Honeywell -->
           <a href="treinamento-honeywell.html" class="training-card" aria-label="Iniciar treinamento: Impressora Honeywell">
             <div class="card-icon">
               <img src="img/honeywell.png" alt="Ilustração da impressora Honeywell">
@@ -800,6 +861,7 @@
       </div>
     </main>
 
+    <!-- 3. POP-UP DE LINKS (Escondido) -->
     <div class="links-popup" id="linksPopup" role="dialog" aria-labelledby="linksTitle">
       <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="linksTitle">Links Rápidos</h3>
@@ -843,9 +905,19 @@
           <button class="go-btn" data-link="https://webmail.novoatacarejo.com/">Acessar</button>
         </div>
       </div>
+
+      <!-- [NOVO] Link adicionado -->
+      <div class="link-item">
+        <span>Acesso Promotores</span>
+        <div class="link-actions">
+          <button class="copy-btn" data-link="http://acesso.novoatacarejo.com">Copiar</button>
+          <button class="go-btn" data-link="http://acesso.novoatacarejo.com">Acessar</button>
+        </div>
+      </div>
       
     </div>
     
+    <!-- 4. POP-UP DE COMANDOS (Escondido) -->
     <div class="links-popup" id="comandosPopup" role="dialog" aria-labelledby="comandosTitle">
       <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="comandosTitle">Comandos PDV (Acrux)</h3>
@@ -942,6 +1014,7 @@
       
     </div>
     
+    <!-- 5. POP-UP DE CONTATOS (Escondido) -->
     <div class="links-popup" id="contatoPopup" role="dialog" aria-labelledby="contatoTitle">
       <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="contatoTitle">Contatos Regionais</h3>
@@ -959,6 +1032,7 @@
       
     </div>
     
+    <!-- 6. POP-UP DE VIRADA DE LOJA (Escondido) -->
     <div class="links-popup" id="viradaPopup" role="dialog" aria-labelledby="viradaTitle">
       <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
       <h3 id="viradaTitle">Orientação Virada de Loja</h3>
@@ -981,6 +1055,41 @@
         <li>Trocar o dominio dos computadores</li>
         <li>Setar novos IPs nas impressoras e adicionar nos desktops</li>
       </ul>
+    </div>
+
+    <!-- [NOVO] 7. POP-UP DE INFORMAÇÕES CRÍTICAS (Escondido) -->
+    <div class="links-popup" id="criticoPopup" role="dialog" aria-labelledby="criticoTitle">
+      <button class="popup-close-btn" aria-label="Fechar pop-up">&times;</button>
+      <h3 id="criticoTitle" style="color: #D62828;">AÇÕES CRÍTICAS EM PDV</h3>
+      
+      <div style="padding: 0 0.5rem;">
+        <div class="alert-box">
+          <h4>ATENÇÃO</h4>
+          <p style="font-size: 0.9rem; margin: 0;">O seu acesso de TI é o único capaz de contornar bloqueios. <strong>O fato de você poder liberar, não significa que você deva liberar.</strong> O uso indevido resultará em ADVERTÊNCIA.</p>
+        </div>
+
+        <div class="critic-section">
+          <div class="critic-title"><span>📅</span> 1. Erro de Data e Hora</div>
+          <div class="critic-scenario">PDV informa data divergente e pede liberação.</div>
+          <p><strong>Impacto:</strong> Contamina o banco de dados com registros inconsistentes.</p>
+          <div class="critic-rule">É ESTRITAMENTE PROIBIDO liberar a abertura sem corrigir a hora.</div>
+          <p><strong>Correto:</strong> Ajustar na BIOS/Windows antes de abrir.</p>
+        </div>
+
+        <div class="critic-section">
+          <div class="critic-title"><span>🔌</span> 2. PDV Offline (Sem Rede)</div>
+          <div class="critic-scenario">PDV sem rede pede para operar em contingência.</div>
+          <p><strong>Impacto:</strong> Vendas retidas causam congestionamento e divergências fiscais ao voltar.</p>
+          <div class="critic-rule">É PROIBIDO autorizar abertura Offline por conta própria.</div>
+          <p><strong>Correto:</strong> Corrigir a rede (cabo, IP) antes de liberar.</p>
+          <p style="font-size:0.85rem; margin-top:5px;"><em>Exceção: Apenas com autorização expressa do GERENTE DE TI.</em></p>
+        </div>
+
+        <div class="info-block" style="background: #fff3cd; border-color: #ffeeba; color: #856404;">
+          <strong>Consequências:</strong> Liberação indevida = Advertência.<br>
+          Seu papel é garantir que o sistema funcione corretamente, não apenas que ele abra.
+        </div>
+      </div>
     </div>
     
   </div>
@@ -1022,14 +1131,16 @@
       const viradaBtn = document.getElementById('viradaBtn');
       const viradaPopup = document.getElementById('viradaPopup');
 
+      // [NOVO] Botão Crítico
+      const criticoBtn = document.getElementById('criticoBtn');
+      const criticoPopup = document.getElementById('criticoPopup');
+
+      // Array de todos os popups e botões
+      const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup, criticoPopup];
+      const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn, criticoBtn];
+
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
-          
-          // [MODIFICADO] Não fecha o menu principal ao clicar
-          // closeMenu(); 
-      
-          const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
-          const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
           
           let isVisible;
 
@@ -1076,28 +1187,22 @@
         });
       }
 
+      // [NOVO] Listener para botão Crítico
+      if(criticoBtn && criticoPopup) {
+        criticoBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePopup(criticoPopup, criticoBtn);
+        });
+      }
+
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
-        const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
-        const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
-        const isClickInsideContato = contatoPopup && contatoPopup.contains(e.target);
-        const isClickInsideVirada = viradaPopup && viradaPopup.contains(e.target); 
-        
-        const isLinksBtn = e.target === linksBtn;
-        const isComandosBtn = e.target === comandosBtn;
-        const isContatoBtn = e.target === contatoBtn;
-        const isViradaBtn = e.target === viradaBtn; 
+        const isClickInsideAnyPopup = allPopups.some(p => p && p.contains(e.target));
+        const isClickInsideAnyBtn = allBtns.some(b => b && b.contains(e.target));
 
-        if (!isClickInsideLinks && !isClickInsideComandos && !isClickInsideContato && !isClickInsideVirada && !isLinksBtn && !isComandosBtn && !isContatoBtn && !isViradaBtn) {
-          if(linksPopup) linksPopup.classList.remove('visible');
-          if(comandosPopup) comandosPopup.classList.remove('visible');
-          if(contatoPopup) contatoPopup.classList.remove('visible');
-          if(viradaPopup) viradaPopup.classList.remove('visible'); 
-          
-          if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
-          if(comandosBtn) comandosBtn.setAttribute('aria-expanded', 'false');
-          if(contatoBtn) contatoBtn.setAttribute('aria-expanded', 'false');
-          if(viradaBtn) viradaBtn.setAttribute('aria-expanded', 'false'); 
+        if (!isClickInsideAnyPopup && !isClickInsideAnyBtn) {
+          allPopups.forEach(p => { if(p) p.classList.remove('visible'); });
+          allBtns.forEach(b => { if(b) b.setAttribute('aria-expanded', 'false'); });
         }
       });
 
@@ -1109,8 +1214,7 @@
           if (popup) {
             popup.classList.remove('visible');
             
-            // Também atualiza o aria-expanded do botão da sidebar
-            const btnId = popup.id.replace('Popup', 'Btn'); // ex: linksPopup -> linksBtn
+            const btnId = popup.id.replace('Popup', 'Btn'); 
             const sidebarBtn = document.getElementById(btnId);
             if (sidebarBtn) {
               sidebarBtn.setAttribute('aria-expanded', 'false');
