@@ -461,6 +461,7 @@
     }
     
     /* --- Estilos do Menu Mobile --- */
+    /* [NOVO] Cabeçalho fixo no mobile */
     .mobile-header {
       display: none; /* Escondido no desktop */
       position: fixed;
@@ -759,6 +760,20 @@
             </div>
             <span class="card-title">Ingresso de PC Faturamento</span>
           </a>
+
+          <a href="treinamento-etiqueta.html" class="training-card" aria-label="Iniciar treinamento: Emissão de etiqueta de Flutuação">
+            <div class="card-icon">
+              <img src="img/etiqueta.png" alt="Ilustração de etiqueta de preço">
+            </div>
+            <span class="card-title">Emissão de etiqueta de Flutuação</span>
+          </a>
+
+          <a href="treinamento-relatorio.html" class="training-card" aria-label="Iniciar treinamento: Emissão de Relatório de Flutuação">
+            <div class="card-icon">
+              <img src="img/relatorio.png" alt="Ilustração de relatório">
+            </div>
+            <span class="card-title">Emissão de Relatório de Flutuação</span>
+          </a>
           
           </div>
       </div>
@@ -986,15 +1001,15 @@
       const viradaBtn = document.getElementById('viradaBtn');
       const viradaPopup = document.getElementById('viradaPopup');
 
-      const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
-      const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
-
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
           
-          // [CORREÇÃO] Não fecha o menu principal ao clicar
+          // [MODIFICADO] Não fecha o menu principal ao clicar
           // closeMenu(); 
       
+          const allPopups = [linksPopup, comandosPopup, contatoPopup, viradaPopup];
+          const allBtns = [linksBtn, comandosBtn, contatoBtn, viradaBtn];
+          
           let isVisible;
 
           allPopups.forEach((p, index) => {
@@ -1042,12 +1057,26 @@
 
       // Fechar ao clicar fora
       document.addEventListener('click', (e) => {
-        const isClickInsideAnyPopup = allPopups.some(p => p && p.contains(e.target));
-        const isClickInsideAnyBtn = allBtns.some(b => b && b.contains(e.target));
+        const isClickInsideLinks = linksPopup && linksPopup.contains(e.target);
+        const isClickInsideComandos = comandosPopup && comandosPopup.contains(e.target);
+        const isClickInsideContato = contatoPopup && contatoPopup.contains(e.target);
+        const isClickInsideVirada = viradaPopup && viradaPopup.contains(e.target); 
+        
+        const isLinksBtn = e.target === linksBtn;
+        const isComandosBtn = e.target === comandosBtn;
+        const isContatoBtn = e.target === contatoBtn;
+        const isViradaBtn = e.target === viradaBtn; 
 
-        if (!isClickInsideAnyPopup && !isClickInsideAnyBtn) {
-          allPopups.forEach(p => { if(p) p.classList.remove('visible'); });
-          allBtns.forEach(b => { if(b) b.setAttribute('aria-expanded', 'false'); });
+        if (!isClickInsideLinks && !isClickInsideComandos && !isClickInsideContato && !isClickInsideVirada && !isLinksBtn && !isComandosBtn && !isContatoBtn && !isViradaBtn) {
+          if(linksPopup) linksPopup.classList.remove('visible');
+          if(comandosPopup) comandosPopup.classList.remove('visible');
+          if(contatoPopup) contatoPopup.classList.remove('visible');
+          if(viradaPopup) viradaPopup.classList.remove('visible'); 
+          
+          if(linksBtn) linksBtn.setAttribute('aria-expanded', 'false');
+          if(comandosBtn) comandosBtn.setAttribute('aria-expanded', 'false');
+          if(contatoBtn) contatoBtn.setAttribute('aria-expanded', 'false');
+          if(viradaBtn) viradaBtn.setAttribute('aria-expanded', 'false'); 
         }
       });
 
@@ -1059,6 +1088,7 @@
           if (popup) {
             popup.classList.remove('visible');
             
+            // Também atualiza o aria-expanded do botão da sidebar
             const btnId = popup.id.replace('Popup', 'Btn'); // ex: linksPopup -> linksBtn
             const sidebarBtn = document.getElementById(btnId);
             if (sidebarBtn) {
