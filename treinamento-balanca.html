@@ -492,12 +492,12 @@
     <div class="senha-box">
       <h3>Senha do Dia</h3>
       <div class="info-block">
-        <strong>Fórmula: (Dia + Mês) + 2011</strong>
+        <strong>Fórmula: 2011 + (DiaMês)</strong>
         <hr style="border:0; border-top: 1px solid rgba(0,0,0,0.1); margin: 10px 0;">
         <strong id="senhaHoje">Calculando...</strong>
         <hr style="border:0; border-top: 1px solid rgba(0,0,0,0.1); margin: 10px 0;">
-        <small>Exemplo (para 01/01):</small><br>
-        <small>(1 + 1) + 2011 = <strong>2013</strong></small>
+        <small>Exemplo (para 30/11):</small><br>
+        <small>2011 + 3011 = <strong>5022</strong></small>
       </div>
       
       <a href="pdf/pop_balanca_wlan.pdf" class="download-btn-pdf" aria-label="Baixar POP em PDF" download>
@@ -534,7 +534,15 @@
         const hoje = new Date();
         const dia = hoje.getDate();
         const mes = hoje.getMonth() + 1;
-        const senha = (dia + mes) + 2011;
+
+        // Formatar dia e mês com 2 dígitos
+        const diaStr = String(dia).padStart(2, '0');
+        const mesStr = String(mes).padStart(2, '0');
+
+        // União do dia e mês (ex: 30 + 11 = "3011")
+        const uniaoDiaMes = parseInt(diaStr + mesStr);
+
+        const senha = 2011 + uniaoDiaMes;
         const targetElement = document.getElementById('senhaHoje');
         if (targetElement) {
           targetElement.textContent = `Senha de Hoje: ${senha}`;
