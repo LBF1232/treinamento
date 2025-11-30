@@ -719,7 +719,7 @@
           <span>🔄</span>
           <span>Virada de Loja</span>
         </button>
-        <!-- [NOVO] Botão Informações Críticas -->
+        <!-- Botão Informações Críticas -->
         <button class="nav-btn" id="criticoBtn" aria-haspopup="true" style="color: #D62828; font-weight: 800;">
           <span>🚨</span>
           <span>INFORMAÇÕES CRÍTICAS</span>
@@ -1029,6 +1029,32 @@
         <strong>Rede</strong>
         <p>Contato: 11 4001-4433</p>
       </div>
+
+      <!-- Novos Contatos -->
+      <div class="contato-item">
+        <strong>Redes: Anderson</strong>
+        <p>81 9998-2361</p>
+      </div>
+      
+      <div class="contato-item">
+        <strong>Consinco Banco de Dados: Marcos Reis</strong>
+        <p>81 8968-0944</p>
+      </div>
+
+      <div class="contato-item">
+        <strong>Dext: Erick Vieira</strong>
+        <p>81 8472-5765</p>
+      </div>
+
+      <div class="contato-item">
+        <strong>MGV Balanças: Gerando Assunção</strong>
+        <p>81 7118-3445</p>
+      </div>
+
+      <div class="contato-item">
+        <strong>AD: Thiago Lima</strong>
+        <p>81 9153-5125</p>
+      </div>
       
     </div>
     
@@ -1072,8 +1098,8 @@
           <div class="critic-title"><span>📅</span> 1. Erro de Data e Hora</div>
           <div class="critic-scenario">PDV informa data divergente e pede liberação.</div>
           <p><strong>Impacto:</strong> Contamina o banco de dados com registros inconsistentes.</p>
-          <div class="critic-rule">É ESTRITAMENTE PROIBIDO liberar a abertura sem corrigir a data e hora.</div>
-          <p><strong>Correto:</strong> Ajustar na BIOS ou nas configuração de Data e Hora do PDV/Windows antes de abrir.</p>
+          <div class="critic-rule">É ESTRITAMENTE PROIBIDO liberar a abertura sem corrigir a hora.</div>
+          <p><strong>Correto:</strong> Ajustar na BIOS/Windows antes de abrir.</p>
         </div>
 
         <div class="critic-section">
@@ -1142,6 +1168,9 @@
       // Função para abrir um popup e fechar os outros
       function togglePopup(popupToShow, btnToShow) {
           
+          // [MODIFICADO] Não fecha o menu principal ao clicar
+          // closeMenu(); 
+      
           let isVisible;
 
           allPopups.forEach((p, index) => {
@@ -1214,7 +1243,8 @@
           if (popup) {
             popup.classList.remove('visible');
             
-            const btnId = popup.id.replace('Popup', 'Btn'); 
+            // Também atualiza o aria-expanded do botão da sidebar
+            const btnId = popup.id.replace('Popup', 'Btn'); // ex: linksPopup -> linksBtn
             const sidebarBtn = document.getElementById(btnId);
             if (sidebarBtn) {
               sidebarBtn.setAttribute('aria-expanded', 'false');
@@ -1267,7 +1297,7 @@
       });
 
 
-      // --- Animações de Entrada (GSAP) ---
+      // --- [CORREÇÃO] Animações de Entrada (GSAP) ---
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         
         // Verifica se é desktop para animar a sidebar
